@@ -13,7 +13,7 @@ export default function KioskCallToAction() {
         className="relative mx-auto max-w-3xl px-6 text-center"
       >
         <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-          See it dismantled in person.
+          See the kiosk in person.
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-white/55">
           Book a walkthrough and we’ll show you how fast the kiosk deploys,

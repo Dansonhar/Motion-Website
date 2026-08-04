@@ -1,15 +1,15 @@
 import { lazy, Suspense } from 'react'
-import KioskExplode from '../components/KioskExplode.jsx'
+import KioskHero from '../components/KioskHero.jsx'
 
-const KioskLegend = lazy(() => import('../components/KioskLegend.jsx'))
+const KioskFeatures = lazy(() => import('../components/KioskFeatures.jsx'))
 const KioskCallToAction = lazy(() => import('../components/KioskCallToAction.jsx'))
 
 export default function KioskSite() {
   return (
     <>
-      <KioskExplode />
+      <KioskHero />
       <Suspense fallback={<div className="h-96" aria-hidden="true" />}>
-        <KioskLegend />
+        <KioskFeatures />
         <KioskCallToAction />
       </Suspense>
     </>

@@ -44,15 +44,16 @@ export default function Benefits() {
               key={benefit.title}
               initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -6 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{
                 duration: 0.55,
                 delay: index * 0.1,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="glass rounded-2xl p-7"
+              className="glass group rounded-2xl p-7 transition-colors duration-300 hover:border-accent-500/30"
             >
-              <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-accent-500/12 text-accent-400 ring-1 ring-accent-500/20">
+              <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-accent-500/12 text-accent-400 ring-1 ring-accent-500/20 transition-colors duration-300 group-hover:bg-accent-500 group-hover:text-ink-950">
                 <benefit.icon size={22} strokeWidth={1.8} />
               </span>
               <h3 className="text-lg font-semibold tracking-tight">

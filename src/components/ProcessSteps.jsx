@@ -34,11 +34,12 @@ export default function ProcessSteps() {
               <motion.article
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -6 }}
                 viewport={{ once: true, margin: '-60px' }}
                 transition={{ duration: 0.6, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
-                className="glass flex-1 rounded-3xl p-8 lg:p-10"
+                className="glass group flex-1 rounded-3xl p-8 transition-colors duration-300 hover:border-accent-500/30 lg:p-10"
               >
-                <span className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-500/15 text-accent-400 ring-1 ring-accent-500/25">
+                <span className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-500/15 text-accent-400 ring-1 ring-accent-500/25 transition-colors duration-300 group-hover:bg-accent-500 group-hover:text-ink-950">
                   <pillar.icon size={26} strokeWidth={1.8} />
                 </span>
                 <h3 className="text-xl font-semibold tracking-tight">{pillar.label}</h3>

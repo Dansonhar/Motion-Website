@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { ScanLine } from 'lucide-react'
 
 const COLUMNS = [
@@ -18,7 +19,13 @@ const COLUMNS = [
 export default function Footer() {
   return (
     <footer className="border-t border-white/8 bg-ink-950 px-5 py-16 sm:px-8">
-      <div className="mx-auto max-w-7xl">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="mx-auto max-w-7xl"
+      >
         <div className="grid gap-12 md:grid-cols-[1.5fr_repeat(3,1fr)]">
           <div>
             <div className="flex items-center gap-2.5">
@@ -45,7 +52,7 @@ export default function Footer() {
                   <li key={link}>
                     <a
                       href="#top"
-                      className="text-sm text-white/50 transition-colors hover:text-accent-400"
+                      className="inline-block text-sm text-white/50 transition-all duration-200 hover:translate-x-1 hover:text-accent-400"
                     >
                       {link}
                     </a>
@@ -67,7 +74,7 @@ export default function Footer() {
             </a>
           </div>
         </div>
-      </div>
+      </motion.div>
     </footer>
   )
 }

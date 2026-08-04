@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { ScanLine } from 'lucide-react'
+import { useAttraction } from '../attractions.jsx'
 
 const COLUMNS = [
   {
@@ -17,6 +18,7 @@ const COLUMNS = [
 ]
 
 export default function Footer() {
+  const { current } = useAttraction()
   return (
     <footer className="border-t border-white/8 bg-ink-950 px-5 py-16 sm:px-8">
       <motion.div
@@ -33,7 +35,8 @@ export default function Footer() {
                 <ScanLine size={18} strokeWidth={2.5} />
               </span>
               <span className="text-lg font-semibold tracking-tight">
-                Gym<span className="text-accent-400">Access</span>
+                {current.brandA}
+                <span className="text-accent-400">{current.brandB}</span>
               </span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/50">

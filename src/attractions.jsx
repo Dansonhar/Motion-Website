@@ -18,6 +18,18 @@ export const ATTRACTIONS = [
     ],
   },
   {
+    id: 'kiosk',
+    label: 'Kiosk Only',
+    brandA: 'Kiosk',
+    brandB: ' Only',
+    available: true,
+    links: [
+      { label: 'Overview', href: '#kiosk' },
+      { label: 'Modules', href: '#parts' },
+      { label: 'Contact', href: '#kiosk-contact' },
+    ],
+  },
+  {
     id: 'themepark',
     label: 'Theme Park',
     brandA: 'Park',

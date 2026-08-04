@@ -155,7 +155,7 @@ function ScrubStage() {
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
         <video
           ref={videoRef}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-contain"
           src={`${import.meta.env.BASE_URL}video/kiosk.mp4`}
           poster={POSTER}
           muted

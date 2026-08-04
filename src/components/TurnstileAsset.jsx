@@ -66,8 +66,8 @@ export default function TurnstileAsset({ className = '' }) {
               <stop offset="1" stopColor="#0e110f" />
             </linearGradient>
             <linearGradient id="ts-led" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#86efac" />
-              <stop offset="1" stopColor="#22c55e" />
+              <stop offset="0" stopColor="#ffffff" />
+              <stop offset="1" stopColor="#d4d4d4" />
             </linearGradient>
             <radialGradient id="ts-chrome" cx="0.4" cy="0.35" r="0.7">
               <stop offset="0" stopColor="#eef3ef" />

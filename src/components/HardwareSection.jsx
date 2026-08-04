@@ -110,7 +110,7 @@ function HorizontalShowcase() {
               <div className="glass relative overflow-hidden rounded-[2rem] p-8 sm:p-10">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(34,197,94,0.16),transparent_65%)]"
+                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(255,255,255,0.16),transparent_65%)]"
                 />
                 <TurnstileAsset className="relative" />
                 <div className="relative mt-6 flex items-center justify-between border-t border-white/8 pt-6">

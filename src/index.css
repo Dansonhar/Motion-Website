@@ -54,3 +54,44 @@ body {
   content-visibility: auto;
   contain-intrinsic-size: auto 600px;
 }
+
+/* 3D turnstile asset — gentle float + pulsing LED glow */
+@keyframes floatY {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+.asset-float {
+  animation: floatY 6s ease-in-out infinite;
+}
+@keyframes ledPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+.led-glow {
+  animation: ledPulse 2.6s ease-in-out infinite;
+}
+/* Hide native scrollbar on horizontal tracks */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .asset-float,
+  .led-glow {
+    animation: none;
+  }
+}

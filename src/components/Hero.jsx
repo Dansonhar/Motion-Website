@@ -189,7 +189,7 @@ function SteppedHero() {
       <video
         ref={videoRef}
         className="absolute inset-0 h-full w-full object-cover"
-        src="/video/gym-hero.mp4"
+        src={`${import.meta.env.BASE_URL}video/gym-hero.mp4`}
         poster={POSTER}
         muted
         playsInline
@@ -351,7 +351,7 @@ function StaticHero() {
     >
       <video
         className="absolute inset-0 h-full w-full object-cover"
-        src="/video/gym-hero.mp4"
+        src={`${import.meta.env.BASE_URL}video/gym-hero.mp4`}
         poster={POSTER}
         muted
         playsInline

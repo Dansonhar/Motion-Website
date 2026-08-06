@@ -51,7 +51,7 @@ function FloatingSwitch() {
           role="menu"
           className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-2xl border border-black/10 bg-white p-1.5 shadow-2xl"
         >
-          {attractions.map((a) => {
+          {attractions.filter((a) => !a.hidden).map((a) => {
             const active = a.id === current.id
             return (
               <li key={a.id}>

@@ -35,7 +35,7 @@ function Shell() {
           {site}
         </Suspense>
       </main>
-      {!standalone && (
+      {!standalone && !current.noFooter && (
         <Suspense fallback={null}>
           <Footer />
         </Suspense>

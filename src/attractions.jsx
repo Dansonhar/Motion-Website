@@ -35,11 +35,10 @@ export const ATTRACTIONS = [
     brandA: 'Park',
     brandB: 'Access',
     available: false,
-    links: [
-      { label: 'Ticketing', href: '#park-ticketing' },
-      { label: 'Gates', href: '#park-gate' },
-      { label: 'Contact', href: '#park-contact' },
-    ],
+    // Pure fullscreen cinematic experience — no page sections to link to, and
+    // the shared footer's copy is Gym-specific, so both are hidden.
+    links: [],
+    noFooter: true,
   },
   {
     id: 'mostar',
@@ -51,6 +50,9 @@ export const ATTRACTIONS = [
     // and footer are hidden and it provides its own attraction switcher.
     standalone: true,
     links: [],
+    // Hidden from the Attractions switcher — the page itself still works if
+    // ever linked to directly, it's just not offered as an option.
+    hidden: true,
   },
 ]
 
@@ -59,7 +61,9 @@ const AttractionContext = createContext(null)
 export function AttractionProvider({ children }) {
   const [id, setId] = useState(() => {
     try {
-      return localStorage.getItem('attraction') || 'gym'
+      const stored = localStorage.getItem('attraction')
+      const match = ATTRACTIONS.find((a) => a.id === stored)
+      return match && !match.hidden ? stored : 'gym'
     } catch {
       return 'gym'
     }

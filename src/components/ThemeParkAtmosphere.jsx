@@ -3,10 +3,11 @@ import * as THREE from 'three'
 
 // Cinematic backdrop for the "Coming Soon" teaser: drifting embers + slow
 // searching light shafts in a dark void, with a camera that pushes forward as
-// the user scrolls — pure atmosphere, no geometry to get "wrong", so it holds
-// up at any angle. Reads scrollYProgress directly each frame (a Framer Motion
-// value is safe to .get() outside React's render cycle).
-export default function ThemeParkAtmosphere({ scrollYProgress, activeUntil = 1 }) {
+// the intro plays out — pure atmosphere, no geometry to get "wrong", so it
+// holds up at any angle. `progress` is any object exposing .get() → 0..1 (a
+// Framer Motion value tweened on a timer, safe to read outside React's render
+// cycle), representing how far through the teaser we are.
+export default function ThemeParkAtmosphere({ progress, activeUntil = 1 }) {
   const mountRef = useRef(null)
 
   useEffect(() => {
@@ -106,7 +107,7 @@ export default function ThemeParkAtmosphere({ scrollYProgress, activeUntil = 1 }
     const frame = () => {
       raf = requestAnimationFrame(frame)
       const t = clock.getElapsedTime()
-      const raw = scrollYProgress.get()
+      const raw = progress.get()
       const p = Math.min(Math.max(raw, 0), activeUntil) / activeUntil
 
       // Push the camera forward through the particle field as the countdown
@@ -154,7 +155,7 @@ export default function ThemeParkAtmosphere({ scrollYProgress, activeUntil = 1 }
       renderer.dispose()
       if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement)
     }
-  }, [scrollYProgress, activeUntil])
+  }, [progress, activeUntil])
 
   return <div ref={mountRef} className="pointer-events-none absolute inset-0 z-0" />
 }

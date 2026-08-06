@@ -5,7 +5,7 @@ import { useAttraction } from '../attractions.jsx'
 const COLUMNS = [
   {
     heading: 'Solutions',
-    links: ['Membership Kiosk', 'Tripod Turnstile', 'Access Control', 'Class Booking'],
+    links: ['Membership Kiosk', 'Tripod Turnstile', 'Face Recognition', 'AI Monitoring'],
   },
   {
     heading: 'Company',
@@ -40,8 +40,8 @@ export default function Footer() {
               </span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/50">
-              A connected gym entrance system pairing self-service kiosks with the
-              MT119-LED tripod turnstile for secure, automated entry.
+              A connected gym entrance system pairing self-service kiosks with
+              face-verified tripod turnstiles and AI tailgating detection.
             </p>
           </div>
 

@@ -1,13 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { ChevronDown, QrCode, ShieldCheck, DoorOpen } from 'lucide-react'
+import {
+  ChevronDown,
+  Smartphone,
+  ScanFace,
+  ShieldCheck,
+  DoorOpen,
+  ScanEye,
+  Send,
+} from 'lucide-react'
 
-// Dark gradient poster shown before the first frame paints.
-const POSTER =
-  'data:image/svg+xml,' +
-  encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b0e0c"/><stop offset="1" stop-color="#060807"/></linearGradient></defs><rect width="1920" height="1080" fill="url(#g)"/></svg>`,
-  )
+// The video's opening frame, shown immediately as the first impression so the
+// gym scene is on screen before the scrub video primes/paints (no dark flash).
+const POSTER = `${import.meta.env.BASE_URL}video/gym-hero-poster.jpg`
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false)
@@ -47,7 +52,6 @@ export default function Hero() {
 function ScrollHero() {
   const containerRef = useRef(null)
   const videoRef = useRef(null)
-  const [ready, setReady] = useState(false)
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -58,11 +62,8 @@ function ScrollHero() {
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
-    const onReady = () => setReady(true)
-    video.addEventListener('loadeddata', onReady)
     const prime = video.play().then(() => video.pause()).catch(() => {})
     return () => {
-      video.removeEventListener('loadeddata', onReady)
       void prime
     }
   }, [])
@@ -96,8 +97,16 @@ function ScrollHero() {
   const hintOpacity = useTransform(scrollYProgress, [0, 0.04], [1, 0])
 
   return (
-    <section ref={containerRef} id="top" className="relative h-[420vh] bg-ink-950">
+    <section ref={containerRef} id="top" className="relative h-[640vh] bg-ink-950">
       <div className="sticky top-0 h-[100svh] overflow-hidden">
+        {/* First-impression frame — visible instantly, under the video */}
+        <img
+          src={POSTER}
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         <video
           ref={videoRef}
           className="absolute inset-0 h-full w-full object-cover"
@@ -115,18 +124,17 @@ function ScrollHero() {
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink-950 to-transparent" />
         <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ink-950/70 to-transparent" />
 
-        {!ready && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-accent-400" />
-          </div>
-        )}
-
         {/* Scenes */}
         <div className="absolute inset-0">
           <div className="relative mx-auto h-full max-w-7xl px-5 sm:px-8">
+            {/* Scene windows are timed to the footage: app sign-up (~0.06–0.26),
+                kiosk face registration (~0.30–0.48), face verification at the
+                gate (~0.54–0.62), turnstile passage (~0.66–0.75), the QSentry
+                detection panel (~0.78–0.88), then the tailgating alert on the
+                phone (~0.90–1.0). */}
             <Scene
               progress={scrollYProgress}
-              range={[0, 0.02, 0.16, 0.24]}
+              range={[-0.05, 0, 0.05, 0.10]}
               className="justify-center text-center md:justify-start md:text-left"
             >
               <IntroScene />
@@ -134,26 +142,50 @@ function ScrollHero() {
 
             <Scene
               progress={scrollYProgress}
-              range={[0.24, 0.3, 0.42, 0.5]}
+              range={[0.10, 0.14, 0.24, 0.29]}
               className="justify-center text-center md:justify-start md:text-left"
             >
-              <StepScene icon={QrCode} step="01" title="Check In" text="Scan a QR code, tap an NFC card or find a membership account at the self-service kiosk." />
+              <StepScene icon={Smartphone} step="01" title="Join From the App" text="Members sign up on their phone and confirm who they are with a quick face scan — registered before they reach the desk." />
             </Scene>
 
             <Scene
               progress={scrollYProgress}
-              range={[0.5, 0.56, 0.68, 0.76]}
+              range={[0.29, 0.33, 0.46, 0.51]}
               className="justify-center text-center md:justify-start md:text-left"
             >
-              <StepScene icon={ShieldCheck} step="02" title="Verify Access" text="The system checks membership and payment status instantly — no front-desk queue." />
+              <StepScene icon={ScanFace} step="02" title="Enrol at the Kiosk" text="One capture at the self-service kiosk registers their face and arms Face ID check-in for every future visit." />
             </Scene>
 
             <Scene
               progress={scrollYProgress}
-              range={[0.76, 0.82, 0.97, 1]}
+              range={[0.51, 0.55, 0.62, 0.66]}
               className="justify-center text-center md:justify-start md:text-left"
             >
-              <StepScene icon={DoorOpen} step="03" title="Enter the Gym" text="The MT119-LED tripod turnstile unlocks for authorised, single-person entry." cta />
+              <StepScene icon={ShieldCheck} step="03" title="Face Verified at the Gate" text="The terminal matches face to membership and grants access instantly — no card, no phone, no queue." />
+            </Scene>
+
+            <Scene
+              progress={scrollYProgress}
+              range={[0.66, 0.69, 0.74, 0.78]}
+              className="justify-center text-center md:justify-start md:text-left"
+            >
+              <StepScene icon={DoorOpen} step="04" title="Walk Straight Through" text="The tripod turnstile releases for one authorised entry, then locks again behind them." />
+            </Scene>
+
+            <Scene
+              progress={scrollYProgress}
+              range={[0.775, 0.80, 0.87, 0.895]}
+              className="justify-center text-center md:justify-start md:text-left"
+            >
+              <StepScene icon={ScanEye} step="05" title="QSentry AI Detects Every Entry" text="Every person in the lane is detected, matched to a member name and confirmed in real time — so you always know exactly who is inside." />
+            </Scene>
+
+            <Scene
+              progress={scrollYProgress}
+              range={[0.895, 0.92, 0.99, 1]}
+              className="justify-center text-center md:justify-start md:text-left"
+            >
+              <StepScene icon={Send} step="06" title="Instant Alerts to Telegram" text="If someone tailgates, QSentry AI pushes a Telegram alert with photo and video evidence — so owners can see exactly what happened at any outlet, from anywhere." cta />
             </Scene>
           </div>
         </div>
@@ -191,8 +223,8 @@ function IntroScene() {
         <span className="text-accent-400">Starts Here</span>
       </h1>
       <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg md:mx-0">
-        Let members register, pay, check in and enter the gym through one
-        connected self-service experience.
+        Members enrol their face once, then walk straight in — while AI watches
+        every entry and flags anyone who slips through.
       </p>
       <div className="mt-9 flex flex-col items-center gap-4 sm:flex-row md:items-start">
         <a
@@ -244,6 +276,13 @@ function StaticHero() {
       id="top"
       className="relative flex min-h-[92svh] items-center overflow-hidden bg-ink-950"
     >
+      <img
+        src={POSTER}
+        alt=""
+        aria-hidden="true"
+          fetchPriority="high"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
       <video
         className="absolute inset-0 h-full w-full object-cover"
         src={`${import.meta.env.BASE_URL}video/gym-hero.mp4`}

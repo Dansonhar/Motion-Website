@@ -30,18 +30,6 @@ export const ATTRACTIONS = [
     ],
   },
   {
-    id: 'boss',
-    label: 'Boss',
-    brandA: 'Boss',
-    brandB: '',
-    available: true,
-    links: [
-      { label: 'Overview', href: '#boss' },
-      { label: 'Features', href: '#boss-features' },
-      { label: 'Contact', href: '#boss-contact' },
-    ],
-  },
-  {
     id: 'themepark',
     label: 'Theme Park',
     brandA: 'Park',

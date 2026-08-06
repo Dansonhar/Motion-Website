@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion'
 import {
+  ScanFace,
   UserPlus,
   RefreshCw,
   QrCode,
-  Nfc,
   CalendarCheck,
   ShoppingBag,
   CreditCard,
@@ -12,6 +12,11 @@ import {
 import SectionHeading from './SectionHeading.jsx'
 
 const FEATURES = [
+  {
+    icon: ScanFace,
+    title: 'Face Enrolment',
+    description: 'Members capture their face once and it becomes their key — nothing to carry or lose.',
+  },
   {
     icon: UserPlus,
     title: 'Member Registration',
@@ -23,14 +28,14 @@ const FEATURES = [
     description: 'Renew plans instantly with saved member profiles and clear pricing.',
   },
   {
-    icon: QrCode,
-    title: 'QR-Code Check-In',
-    description: 'Members scan a personal QR code for fast, contactless entry.',
+    icon: CreditCard,
+    title: 'Card Payments',
+    description: 'Secure integrated card terminal for memberships, classes and products.',
   },
   {
-    icon: Nfc,
-    title: 'NFC Card Access',
-    description: 'A single tap of the member card verifies identity and access rights.',
+    icon: QrCode,
+    title: 'QR & NFC Fallback',
+    description: 'Guests, day passes and staff can still enter by scan or card tap.',
   },
   {
     icon: CalendarCheck,
@@ -41,11 +46,6 @@ const FEATURES = [
     icon: ShoppingBag,
     title: 'Product Purchases',
     description: 'Sell drinks, gear and supplements through the same self-service flow.',
-  },
-  {
-    icon: CreditCard,
-    title: 'Card Payments',
-    description: 'Secure integrated card terminal for memberships, classes and products.',
   },
   {
     icon: Printer,
@@ -67,7 +67,7 @@ export default function FeatureGrid() {
         <SectionHeading
           eyebrow="Kiosk Features"
           title="Everything Members Need, Self-Served"
-          description="The membership kiosk handles the full front-desk journey — from first sign-up to daily check-in — on one screen."
+          description="The membership kiosk handles the full front-desk journey — sign-up, face enrolment, payments and bookings — on one screen."
         />
 
         <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

@@ -6,6 +6,7 @@ const ProcessSteps = lazy(() => import('../components/ProcessSteps.jsx'))
 const KioskShowcase = lazy(() => import('../components/KioskShowcase.jsx'))
 const FeatureGrid = lazy(() => import('../components/FeatureGrid.jsx'))
 const SwingBarrier = lazy(() => import('../components/SwingBarrier.jsx'))
+const QSentry = lazy(() => import('../components/QSentry.jsx'))
 const StatsBand = lazy(() => import('../components/StatsBand.jsx'))
 const Benefits = lazy(() => import('../components/Benefits.jsx'))
 const CallToAction = lazy(() => import('../components/CallToAction.jsx'))
@@ -19,6 +20,7 @@ export default function GymSite() {
         <KioskShowcase />
         <FeatureGrid />
         <SwingBarrier />
+        <QSentry />
         <StatsBand />
         <Benefits />
         <CallToAction />

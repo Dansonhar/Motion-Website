@@ -29,8 +29,8 @@ export default function CallToAction() {
             Give Members a Faster Way In
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/65 sm:text-lg">
-            Connect self-service registration, payments, check-ins and secure gym
-            access in one complete system.
+            Self-service sign-up, face-verified entry and AI-monitored turnstiles —
+            one connected system from the app to the gym floor.
           </p>
           <div className="mt-9 flex justify-center">
             <a

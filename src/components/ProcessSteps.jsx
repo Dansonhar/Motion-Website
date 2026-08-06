@@ -1,17 +1,22 @@
 import { motion } from 'framer-motion'
-import { MonitorSmartphone, ArrowRight, DoorClosed } from 'lucide-react'
+import { ScanFace, ArrowRight, DoorClosed, Send } from 'lucide-react'
 import SectionHeading from './SectionHeading.jsx'
 
 const PILLARS = [
   {
-    icon: MonitorSmartphone,
-    label: 'Self-Service Kiosk',
-    points: ['Registration & renewal', 'Payments & class booking', 'QR / NFC check-in'],
+    icon: ScanFace,
+    label: 'Enrol Once',
+    points: ['Sign up in the app or at the kiosk', 'Face enrolled in seconds', 'Membership & payment on file'],
   },
   {
     icon: DoorClosed,
-    label: 'MT119-LED Turnstile',
-    points: ['Instant access verification', 'Single-person entry', 'Auto-locking gate'],
+    label: 'Face-Verified Entry',
+    points: ['Terminal matches face to membership', 'Tripod turnstile releases one person', 'No card, no phone, no queue'],
+  },
+  {
+    icon: Send,
+    label: 'Alerts on Your Phone',
+    points: ['Counts and names every entry', 'Detects tailgating in the lane', 'Telegram alert with photo & video'],
   },
 ]
 
@@ -23,7 +28,7 @@ export default function ProcessSteps() {
           <SectionHeading
             eyebrow="How It Works"
             title="One Connected Gym Entrance"
-            description="Members complete registration, payments and check-ins at the self-service kiosk. Once access is approved, the tripod turnstile unlocks automatically for secure entry."
+            description="Members enrol once — in the app or at the kiosk — and their face becomes their membership card. The turnstile verifies and releases them in seconds, while AI watches the lane and sends a Telegram alert the moment anyone slips through."
           />
         </div>
 
@@ -53,8 +58,8 @@ export default function ProcessSteps() {
                 </ul>
               </motion.article>
 
-              {/* Connector arrow between the two pillars */}
-              {index === 0 && (
+              {/* Connector arrow between consecutive pillars */}
+              {index < PILLARS.length - 1 && (
                 <motion.span
                   initial={{ opacity: 0, scale: 0.6 }}
                   whileInView={{ opacity: 1, scale: 1 }}

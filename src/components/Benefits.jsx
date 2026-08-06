@@ -13,19 +13,19 @@ const BENEFITS = [
     icon: Gauge,
     title: 'Faster Member Check-Ins',
     description:
-      'QR and NFC entry moves members through the turnstile in seconds, even at peak.',
+      'Members are recognised on approach and through the gate in seconds — even at peak.',
   },
   {
     icon: ShieldCheck,
-    title: 'Improve Entrance Security',
+    title: 'Stop Shared Memberships',
     description:
-      'Single-person control and automatic locking prevent tailgating and unpaid access.',
+      'Face verification ties every entry to a real member, so passes can’t be handed around.',
   },
   {
     icon: Network,
-    title: 'Connected Access Records',
+    title: 'Oversight From Anywhere',
     description:
-      'Every entry stays linked to your gym system for accurate, real-time reporting.',
+      'Telegram alerts land with photo and video, so owners can check any outlet without being on site.',
   },
 ]
 

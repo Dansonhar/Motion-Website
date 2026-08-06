@@ -13,7 +13,7 @@ const POSTER =
 
 const HIGHLIGHTS = [
   { icon: UserPlus, title: 'Register & Renew', text: 'Members sign up and renew memberships on-screen — no queue, no staff.' },
-  { icon: ScanLine, title: 'QR & NFC Check-In', text: 'Scan a QR code or tap an NFC card to check in and open the gate.' },
+  { icon: ScanLine, title: 'Enrol a Face', text: 'One capture at the kiosk turns a member’s face into their access key.' },
   { icon: CreditCard, title: 'Pay & Print', text: 'Integrated card payments with printed receipts and confirmations.' },
   { icon: CalendarCheck, title: 'Book Classes', text: 'Browse the timetable and reserve classes right at the kiosk.' },
 ]
@@ -71,7 +71,7 @@ function KioskCaption() {
           One Screen, the Whole Front Desk
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">
-          Registration, payments, class booking and check-in — the full
+          Sign-up, face enrolment, payments and class booking — the full
           self-service flow.
         </p>
       </div>
@@ -85,7 +85,7 @@ function SimpleStage() {
   return (
     <section id="solutions-kiosk" className="relative w-full bg-ink-950">
       <video
-        className="aspect-video w-full object-cover"
+        className="aspect-video w-full object-contain"
         src={`${import.meta.env.BASE_URL}video/kiosk.mp4`}
         poster={POSTER}
         autoPlay
@@ -99,8 +99,8 @@ function SimpleStage() {
   )
 }
 
-/* Desktop: full-bleed, fullscreen scroll-scrubbed video. On landscape screens a
-   16:9 clip fills cleanly with object-cover (no bars, negligible edge crop). */
+/* Desktop: fullscreen scroll-scrubbed video, letterboxed inside a safe area
+   so every on-screen annotation stays visible. */
 function ScrubStage() {
   const containerRef = useRef(null)
   const videoRef = useRef(null)
@@ -152,10 +152,13 @@ function ScrubStage() {
 
   return (
     <section ref={containerRef} id="solutions-kiosk" className="relative h-[400vh] bg-black">
-      <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
+      {/* The video carries its own on-screen annotations, so it sits inside a
+          safe area: padded clear of the fixed navbar and the scroll hint, with
+          object-contain so no edge of the frame is ever cropped or covered. */}
+      <div className="sticky top-0 flex h-[100svh] w-full items-center justify-center overflow-hidden pb-14 pt-16 sm:pt-20">
         <video
           ref={videoRef}
-          className="absolute inset-0 h-full w-full object-contain"
+          className="h-full w-full object-contain"
           src={`${import.meta.env.BASE_URL}video/kiosk.mp4`}
           poster={POSTER}
           muted
@@ -164,9 +167,6 @@ function ScrubStage() {
           aria-hidden="true"
           tabIndex={-1}
         />
-
-        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-ink-950/80 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-ink-950 via-ink-950/40 to-transparent" />
 
         {!ready && (
           <div className="absolute inset-0 flex items-center justify-center">

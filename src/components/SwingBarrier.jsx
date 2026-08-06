@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import {
-  Accessibility,
-  ShieldCheck,
   Lightbulb,
-  ArrowLeftRight,
+  ShieldCheck,
+  Wrench,
+  Ruler,
   ChevronDown,
 } from 'lucide-react'
 
@@ -12,10 +12,10 @@ const POSTER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1920' height='1080'%3E%3Crect width='1920' height='1080' fill='%23060807'/%3E%3C/svg%3E"
 
 const HIGHLIGHTS = [
-  { icon: Accessibility, title: 'Accessible Wide Lane', text: 'A wider swing lane welcomes wheelchairs, prams and gym bags with ease.' },
-  { icon: ArrowLeftRight, title: 'Bidirectional Control', text: 'Manages entry and exit in a single lane with anti-tailgating logic.' },
-  { icon: Lightbulb, title: 'LED Direction Cues', text: 'Green and red indicators guide members and signal access status.' },
-  { icon: ShieldCheck, title: 'Anti-Pinch Panel', text: 'Silent servo swing panel auto-closes safely after each passage.' },
+  { icon: Lightbulb, title: 'LED Status Indicator', text: 'A full-height light strip shows green to pass and red to stop, readable across the floor.' },
+  { icon: Wrench, title: 'Stainless Steel Arms', text: 'Three solid drop-arms on a stainless mechanism, built for constant peak-hour use.' },
+  { icon: Ruler, title: 'Compact Modern Design', text: 'A slim footprint that fits tight entrances without crowding the lobby.' },
+  { icon: ShieldCheck, title: 'One Person Per Unlock', text: 'The arm releases for a single verified entry, then locks again behind them.' },
 ]
 
 function usePrefersReducedMotion() {
@@ -68,10 +68,10 @@ function BarrierCaption() {
           Entrance Hardware
         </p>
         <h2 className="text-4xl font-bold tracking-tight sm:text-6xl">
-          Tripod Swing Barrier
+          Tripod Turnstile
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">
-          A wider, accessible swing lane for smooth, silent entry.
+          The gate that turns a verified face into a single, secure entry.
         </p>
       </div>
     </section>
@@ -84,22 +84,22 @@ function SimpleStage() {
   return (
     <section id="hardware" className="relative w-full bg-ink-950">
       <video
-        className="aspect-video w-full object-cover"
-        src={`${import.meta.env.BASE_URL}video/swing-barrier.mp4`}
+        className="aspect-video w-full object-contain"
+        src={`${import.meta.env.BASE_URL}video/tripod-promo.mp4`}
         poster={POSTER}
         autoPlay
         muted
         loop
         playsInline
         preload="metadata"
-        aria-label="Tripod swing barrier"
+        aria-label="Tripod turnstile promotional video"
       />
     </section>
   )
 }
 
-/* Desktop: full-bleed, fullscreen scroll-scrubbed video. On landscape screens a
-   16:9 clip fills cleanly with object-cover (no bars, negligible edge crop). */
+/* Desktop: fullscreen scroll-scrubbed video, letterboxed inside a safe area
+   so every on-screen annotation stays visible. */
 function ScrubStage() {
   const containerRef = useRef(null)
   const videoRef = useRef(null)
@@ -151,11 +151,14 @@ function ScrubStage() {
 
   return (
     <section ref={containerRef} id="hardware" className="relative h-[400vh] bg-black">
-      <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
+      {/* The video carries its own on-screen annotations, so it sits inside a
+          safe area: padded clear of the fixed navbar and the scroll hint, with
+          object-contain so no edge of the frame is ever cropped or covered. */}
+      <div className="sticky top-0 flex h-[100svh] w-full items-center justify-center overflow-hidden pb-14 pt-16 sm:pt-20">
         <video
           ref={videoRef}
-          className="absolute inset-0 h-full w-full object-contain"
-          src={`${import.meta.env.BASE_URL}video/swing-barrier.mp4`}
+          className="h-full w-full object-contain"
+          src={`${import.meta.env.BASE_URL}video/tripod-promo.mp4`}
           poster={POSTER}
           muted
           playsInline
@@ -163,9 +166,6 @@ function ScrubStage() {
           aria-hidden="true"
           tabIndex={-1}
         />
-
-        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-ink-950/80 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-ink-950 via-ink-950/40 to-transparent" />
 
         {!ready && (
           <div className="absolute inset-0 flex items-center justify-center">

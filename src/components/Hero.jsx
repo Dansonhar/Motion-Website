@@ -14,6 +14,42 @@ import {
 // gym scene is on screen before the scrub video primes/paints (no dark flash).
 const POSTER = `${import.meta.env.BASE_URL}video/gym-hero-poster.jpg`
 
+// The entry journey. Desktop maps these onto scroll-timed scenes over the
+// scrubbing video; phones render them as a readable list under an autoplaying
+// clip (scroll-scrubbing is unreliable on iOS and crops a 16:9 clip badly).
+const STEPS = [
+  {
+    icon: Smartphone, step: '01', title: 'Join From the App',
+    text: 'Members sign up on their phone and confirm who they are with a quick face scan — registered before they reach the desk.',
+    range: [0.10, 0.14, 0.24, 0.29],
+  },
+  {
+    icon: ScanFace, step: '02', title: 'Enrol at the Kiosk',
+    text: 'One capture at the self-service kiosk registers their face and arms Face ID check-in for every future visit.',
+    range: [0.29, 0.33, 0.46, 0.51],
+  },
+  {
+    icon: ShieldCheck, step: '03', title: 'Face Verified at the Gate',
+    text: 'The terminal matches face to membership and grants access instantly — no card, no phone, no queue.',
+    range: [0.51, 0.55, 0.62, 0.66],
+  },
+  {
+    icon: DoorOpen, step: '04', title: 'Walk Straight Through',
+    text: 'The tripod turnstile releases for one authorised entry, then locks again behind them.',
+    range: [0.66, 0.69, 0.74, 0.78],
+  },
+  {
+    icon: ScanEye, step: '05', title: 'QSentry AI Detects Every Entry',
+    text: 'Every person in the lane is detected, matched to a member name and confirmed in real time — so you always know exactly who is inside.',
+    range: [0.775, 0.80, 0.87, 0.895],
+  },
+  {
+    icon: Send, step: '06', title: 'Instant Alerts to Telegram',
+    text: 'If someone tailgates, QSentry AI pushes a Telegram alert with photo and video evidence — so owners can see exactly what happened at any outlet, from anywhere.',
+    range: [0.895, 0.92, 0.99, 1], cta: true,
+  },
+]
+
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false)
   useEffect(() => {
@@ -24,6 +60,21 @@ function usePrefersReducedMotion() {
     return () => mq.removeEventListener('change', update)
   }, [])
   return reduced
+}
+
+// Phones (portrait). Desktop layout is untouched by this branch.
+function useIsMobile() {
+  const [mobile, setMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches,
+  )
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)')
+    const update = () => setMobile(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+  return mobile
 }
 
 // An overlay "scene" that fades + drifts across a scroll range [in, hold1, hold2, out].
@@ -42,8 +93,84 @@ function Scene({ progress, range, className = '', children }) {
 
 export default function Hero() {
   const reduced = usePrefersReducedMotion()
+  const isMobile = useIsMobile()
   if (reduced) return <StaticHero />
+  if (isMobile) return <MobileHero />
   return <ScrollHero />
+}
+
+/* Phone layout: the clip autoplays in a full-width 16:9 block — matching the
+   video's own shape, so nothing is cropped and there are no black bars — with
+   the journey below it as a readable list instead of a 6-screen scroll scrub. */
+function MobileHero() {
+  return (
+    <section id="top" className="relative bg-ink-950 pt-16">
+      <video
+        className="aspect-video w-full object-contain"
+        src={`${import.meta.env.BASE_URL}video/gym-hero.mp4`}
+        poster={POSTER}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-label="Members entering the gym with face-verified access"
+      />
+
+      <div className="px-5 pb-4 pt-10 text-center">
+        <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent-500/30 bg-accent-500/10 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-accent-300">
+          <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
+          Connected Gym Entrance System
+        </p>
+        <h1 className="text-[2rem] font-bold leading-[1.1] tracking-tight">
+          Smarter Gym Access
+          <br />
+          <span className="text-accent-400">Starts Here</span>
+        </h1>
+        <p className="mx-auto mt-4 max-w-sm text-[0.95rem] leading-relaxed text-white/75">
+          Members enrol their face once, then walk straight in — while AI watches
+          every entry and flags anyone who slips through.
+        </p>
+        <div className="mt-7 flex flex-col gap-3">
+          <a
+            href="#contact"
+            className="w-full rounded-full bg-accent-500 px-6 py-3.5 text-center text-[0.95rem] font-semibold text-ink-950"
+          >
+            Request a Demo
+          </a>
+          <a
+            href="#solutions"
+            className="glass w-full rounded-full px-6 py-3.5 text-center text-[0.95rem] font-semibold text-white"
+          >
+            Explore the System
+          </a>
+        </div>
+      </div>
+
+      {/* The journey, as scroll-revealed cards */}
+      <div className="space-y-4 px-5 pb-16 pt-8">
+        {STEPS.map((s, i) => (
+          <motion.article
+            key={s.step}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.45, delay: (i % 2) * 0.06 }}
+            className="glass rounded-2xl p-5"
+          >
+            <div className="mb-3 flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-500/15 text-accent-400 ring-1 ring-accent-500/25">
+                <s.icon size={20} strokeWidth={1.8} />
+              </span>
+              <span className="text-2xl font-bold text-white/15">{s.step}</span>
+            </div>
+            <h2 className="text-xl font-bold tracking-tight">{s.title}</h2>
+            <p className="mt-1.5 text-sm leading-relaxed text-white/65">{s.text}</p>
+          </motion.article>
+        ))}
+      </div>
+    </section>
+  )
 }
 
 /* Continuous scroll-scrubbed hero: the tall container drives scroll progress,
@@ -140,53 +267,16 @@ function ScrollHero() {
               <IntroScene />
             </Scene>
 
-            <Scene
-              progress={scrollYProgress}
-              range={[0.10, 0.14, 0.24, 0.29]}
-              className="justify-center text-center md:justify-start md:text-left"
-            >
-              <StepScene icon={Smartphone} step="01" title="Join From the App" text="Members sign up on their phone and confirm who they are with a quick face scan — registered before they reach the desk." />
-            </Scene>
-
-            <Scene
-              progress={scrollYProgress}
-              range={[0.29, 0.33, 0.46, 0.51]}
-              className="justify-center text-center md:justify-start md:text-left"
-            >
-              <StepScene icon={ScanFace} step="02" title="Enrol at the Kiosk" text="One capture at the self-service kiosk registers their face and arms Face ID check-in for every future visit." />
-            </Scene>
-
-            <Scene
-              progress={scrollYProgress}
-              range={[0.51, 0.55, 0.62, 0.66]}
-              className="justify-center text-center md:justify-start md:text-left"
-            >
-              <StepScene icon={ShieldCheck} step="03" title="Face Verified at the Gate" text="The terminal matches face to membership and grants access instantly — no card, no phone, no queue." />
-            </Scene>
-
-            <Scene
-              progress={scrollYProgress}
-              range={[0.66, 0.69, 0.74, 0.78]}
-              className="justify-center text-center md:justify-start md:text-left"
-            >
-              <StepScene icon={DoorOpen} step="04" title="Walk Straight Through" text="The tripod turnstile releases for one authorised entry, then locks again behind them." />
-            </Scene>
-
-            <Scene
-              progress={scrollYProgress}
-              range={[0.775, 0.80, 0.87, 0.895]}
-              className="justify-center text-center md:justify-start md:text-left"
-            >
-              <StepScene icon={ScanEye} step="05" title="QSentry AI Detects Every Entry" text="Every person in the lane is detected, matched to a member name and confirmed in real time — so you always know exactly who is inside." />
-            </Scene>
-
-            <Scene
-              progress={scrollYProgress}
-              range={[0.895, 0.92, 0.99, 1]}
-              className="justify-center text-center md:justify-start md:text-left"
-            >
-              <StepScene icon={Send} step="06" title="Instant Alerts to Telegram" text="If someone tailgates, QSentry AI pushes a Telegram alert with photo and video evidence — so owners can see exactly what happened at any outlet, from anywhere." cta />
-            </Scene>
+            {STEPS.map((s) => (
+              <Scene
+                key={s.step}
+                progress={scrollYProgress}
+                range={s.range}
+                className="justify-center text-center md:justify-start md:text-left"
+              >
+                <StepScene icon={s.icon} step={s.step} title={s.title} text={s.text} cta={s.cta} />
+              </Scene>
+            ))}
           </div>
         </div>
 

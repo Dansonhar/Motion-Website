@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
-import { ScanLine } from 'lucide-react'
 import { useAttraction } from '../attractions.jsx'
+import Logo from './Logo.jsx'
 
 // Company/Resources are generic across every attraction; only "Solutions"
 // is product-specific, so it comes from each attraction's own `footer` field.
@@ -35,15 +35,7 @@ export default function Footer() {
       >
         <div className="grid gap-12 md:grid-cols-[1.5fr_repeat(3,1fr)]">
           <div>
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-500 text-ink-950">
-                <ScanLine size={18} strokeWidth={2.5} />
-              </span>
-              <span className="text-lg font-semibold tracking-tight">
-                {current.brandA}
-                <span className="text-accent-400">{current.brandB}</span>
-              </span>
-            </div>
+            <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/50">
               {blurb}
             </p>

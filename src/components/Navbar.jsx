@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ScanLine, Layers, ChevronDown, Check } from 'lucide-react'
+import { Menu, X, Layers, ChevronDown, Check } from 'lucide-react'
 import { useAttraction } from '../attractions.jsx'
+import Logo from './Logo.jsx'
 
 export default function Navbar() {
   const { current, setAttraction, attractions } = useAttraction()
@@ -48,14 +49,8 @@ export default function Navbar() {
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:h-20 sm:px-8">
         <div className="flex items-center gap-3 sm:gap-5">
           {/* Logo */}
-          <a href="#top" className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-500 text-ink-950">
-              <ScanLine size={18} strokeWidth={2.5} />
-            </span>
-            <span className="text-lg font-semibold tracking-tight">
-              {current.brandA}
-              <span className="text-accent-400">{current.brandB}</span>
-            </span>
+          <a href="#top" aria-label="Q Studio" className="flex items-center">
+            <Logo />
           </a>
 
           {/* Attractions selector */}

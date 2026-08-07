@@ -19,22 +19,22 @@ const STEPS = [
   {
     icon: Smartphone, step: '01', title: 'Join From the App',
     text: 'Members sign up on their phone and pick a plan — no forms at the front desk, no waiting for staff.',
-    range: [0.09, 0.13, 0.24, 0.29],
+    range: [0.11, 0.15, 0.23, 0.26],
   },
   {
     icon: ScanFace, step: '02', title: 'Verify With Face ID',
     text: 'A quick face scan in the app confirms the person signing up is really them.',
-    range: [0.29, 0.32, 0.40, 0.44],
+    range: [0.27, 0.30, 0.34, 0.37],
   },
   {
     icon: MonitorCheck, step: '03', title: 'Enrol at the Kiosk',
     text: 'One capture at the self-service kiosk registers their face and arms Face ID entry for every future visit.',
-    range: [0.45, 0.49, 0.78, 0.83],
+    range: [0.39, 0.43, 0.67, 0.70],
   },
   {
     icon: ShieldCheck, step: '04', title: 'Face Verified, Access Granted',
     text: 'The gate terminal matches face to membership and opens instantly — no card, no phone, no queue.',
-    range: [0.84, 0.88, 0.98, 1], cta: true,
+    range: [0.73, 0.77, 0.97, 1], cta: true,
   },
 ]
 
@@ -72,7 +72,7 @@ function Scene({ progress, range, className = '', children }) {
   return (
     <motion.div
       style={{ opacity, y }}
-      className={`absolute inset-0 flex items-center ${className}`}
+      className={`absolute inset-0 flex items-center [text-shadow:0_1px_3px_rgba(0,0,0,0.95),0_3px_12px_rgba(0,0,0,0.85),0_10px_40px_rgba(0,0,0,0.7)] ${className}`}
     >
       {children}
     </motion.div>
@@ -106,7 +106,7 @@ function MobileHero() {
       />
 
       <div className="px-5 pb-4 pt-10 text-center">
-        <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent-500/30 bg-accent-500/10 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-accent-300">
+        <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/30 bg-ink-950/60 backdrop-blur-md px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-white">
           <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
           Connected Gym Entrance System
         </p>
@@ -115,7 +115,7 @@ function MobileHero() {
           <br />
           <span className="text-accent-400">Starts Here</span>
         </h1>
-        <p className="mx-auto mt-4 max-w-sm text-[0.95rem] leading-relaxed text-white/75">
+        <p className="mx-auto mt-4 max-w-sm text-[0.95rem] leading-relaxed text-white">
           Members join in the app, enrol their face at the kiosk, then walk
           straight in — no card, no phone, no queue.
         </p>
@@ -128,7 +128,7 @@ function MobileHero() {
           </a>
           <a
             href="#solutions"
-            className="glass w-full rounded-full px-6 py-3.5 text-center text-[0.95rem] font-semibold text-white"
+            className="w-full rounded-full border border-white/30 bg-ink-950/60 px-6 py-3.5 text-center text-[0.95rem] font-semibold text-white backdrop-blur-md"
           >
             Explore the System
           </a>
@@ -150,10 +150,10 @@ function MobileHero() {
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-500/15 text-accent-400 ring-1 ring-accent-500/25">
                 <s.icon size={20} strokeWidth={1.8} />
               </span>
-              <span className="text-2xl font-bold text-white/15">{s.step}</span>
+              <span className="text-2xl font-bold text-white/70">{s.step}</span>
             </div>
             <h2 className="text-xl font-bold tracking-tight">{s.title}</h2>
-            <p className="mt-1.5 text-sm leading-relaxed text-white/65">{s.text}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-white/90">{s.text}</p>
           </motion.article>
         ))}
       </div>
@@ -234,10 +234,10 @@ function ScrollHero() {
           tabIndex={-1}
         />
 
-        {/* Readability overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/55 to-ink-950/15" />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink-950 to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ink-950/70 to-transparent" />
+        {/* No scrims over the video at all — the footage shows at full
+            brightness. Legibility is carried entirely by the copy's own
+            text-shadow (see Scene), which only darkens the pixels immediately
+            behind the letters instead of dimming the frame. */}
 
         {/* Scenes */}
         <div className="absolute inset-0">
@@ -269,7 +269,7 @@ function ScrollHero() {
         {/* Scroll hint */}
         <motion.div
           style={{ opacity: hintOpacity }}
-          className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 text-white/50"
+          className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 rounded-full bg-ink-950/55 px-4 py-2 text-white backdrop-blur-sm"
         >
           <span className="text-[11px] font-medium uppercase tracking-widest">
             Scroll to continue
@@ -289,7 +289,7 @@ function ScrollHero() {
 function IntroScene() {
   return (
     <div className="mx-auto max-w-2xl md:mx-0">
-      <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-accent-500/30 bg-accent-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-accent-300">
+      <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-ink-950/60 backdrop-blur-md px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-white">
         <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
         Connected Gym Entrance System
       </p>
@@ -298,7 +298,7 @@ function IntroScene() {
         <br />
         <span className="text-accent-400">Starts Here</span>
       </h1>
-      <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg md:mx-0">
+      <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white sm:text-lg md:mx-0">
         Members join in the app, enrol their face at the kiosk, then walk
         straight in — no card, no phone, no queue.
       </p>
@@ -311,7 +311,7 @@ function IntroScene() {
         </a>
         <a
           href="#solutions"
-          className="glass w-full rounded-full px-8 py-4 text-center text-base font-semibold text-white transition-transform hover:-translate-y-0.5 sm:w-auto"
+          className="w-full rounded-full border border-white/30 bg-ink-950/60 px-8 py-4 text-center text-base font-semibold text-white backdrop-blur-md transition-transform hover:-translate-y-0.5 sm:w-auto"
         >
           Explore the System
         </a>
@@ -327,10 +327,10 @@ function StepScene({ icon: Icon, step, title, text, cta }) {
         <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-500/15 text-accent-400 ring-1 ring-accent-500/25 backdrop-blur-sm">
           <Icon size={30} strokeWidth={1.8} />
         </span>
-        <span className="text-6xl font-bold text-white/10">{step}</span>
+        <span className="text-6xl font-bold text-white/70">{step}</span>
       </div>
       <h2 className="text-4xl font-bold tracking-tight sm:text-6xl">{title}</h2>
-      <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-white/75 sm:text-lg md:mx-0">
+      <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-white sm:text-lg md:mx-0">
         {text}
       </p>
       {cta && (
@@ -369,7 +369,7 @@ function StaticHero() {
         aria-hidden="true"
         tabIndex={-1}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-ink-950/90 via-ink-950/55 to-ink-950/20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-ink-950/45 via-transparent to-transparent" />
       <div className="relative z-10 mx-auto w-full max-w-7xl px-5 sm:px-8">
         <IntroScene />
       </div>

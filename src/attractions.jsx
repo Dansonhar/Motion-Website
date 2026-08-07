@@ -23,23 +23,6 @@ export const ATTRACTIONS = [
     },
   },
   {
-    id: 'kiosk',
-    label: 'Kiosk Only',
-    brandA: 'Kiosk',
-    brandB: ' Only',
-    available: true,
-    links: [
-      { label: 'Overview', href: '#kiosk' },
-      { label: 'Modules', href: '#parts' },
-      { label: 'Contact', href: '#kiosk-contact' },
-    ],
-    footer: {
-      blurb:
-        'A self-service ordering kiosk built from six clean modules — display, payments, printing and a rock-solid stand.',
-      solutions: ['Touch Display', 'Card Terminal', 'Printer & NFC', 'Pedestal Base'],
-    },
-  },
-  {
     id: 'themepark',
     label: 'Theme Park',
     brandA: 'Park',

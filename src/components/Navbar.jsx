@@ -39,7 +39,10 @@ export default function Navbar() {
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled
           ? 'border-b border-white/5 bg-ink-950/85 backdrop-blur-xl'
-          : 'border-b border-transparent bg-transparent'
+          : // At the top the bar sits directly on the hero video, which is no
+            // longer darkened by any scrim — so the labels carry their own
+            // shadow to stay legible over bright footage.
+            'border-b border-transparent bg-transparent [text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_10px_rgba(0,0,0,0.6)]'
       }`}
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:h-20 sm:px-8">

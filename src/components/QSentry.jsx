@@ -64,9 +64,9 @@ export default function QSentry() {
 }
 
 /* Real detection footage from the QSentry monitor, shown straight after the
-   feature video. The clip is a 1562x1080 UI capture, not 16:9 — the frame is
-   locked to its native ratio so the timestamp, the "QSENTRY AI" label and the
-   TAILGATING DETECTED banner are never cropped. */
+   feature video. A 16:9 capture in a 16:9 frame, so the "QSENTRY AI" label,
+   the red alarm bars down both edges and the TAILGATE DETECTED banner are all
+   fully in shot. */
 function DetectionClip() {
   return (
     <section className="relative bg-ink-950 px-5 pt-12 sm:px-8 sm:pt-16">
@@ -83,16 +83,16 @@ function DetectionClip() {
           <h3 className="text-center text-2xl font-semibold tracking-tight text-white sm:text-3xl">
             This is what a tailgate looks like.
           </h3>
-          <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-relaxed text-white/60 sm:text-base">
-            One member taps in and walks through. A second person slips through
-            behind him on the same rotation — no tap, no membership. QSentry
-            flags it in the same second, boxes the person who did it and stamps
-            the exact time.
+          <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-relaxed text-white/70 sm:text-base">
+            One member is cleared through the lane and a second walks in behind
+            him on the same opening — no tap, no membership. QSentry tracks both
+            people, throws TAILGATE DETECTED the moment the second one crosses,
+            and lights the alarm in the same second.
           </p>
 
           <div className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl">
             <video
-              className="aspect-[1562/1080] w-full object-contain"
+              className="aspect-video w-full object-contain"
               src={`${import.meta.env.BASE_URL}video/gym/qsentry-detect.mp4`}
               poster={`${import.meta.env.BASE_URL}video/gym/qsentry-detect-poster.jpg`}
               autoPlay
@@ -100,7 +100,7 @@ function DetectionClip() {
               loop
               playsInline
               preload="metadata"
-              aria-label="QSentry AI monitor detecting a tailgater at a turnstile"
+              aria-label="QSentry AI monitor detecting a tailgater at a swing barrier lane"
             />
           </div>
         </motion.div>
@@ -166,9 +166,28 @@ function ScrubStage() {
     if (!video) return
     const onReady = () => setReady(true)
     video.addEventListener('loadeddata', onReady)
-    const prime = video.play().then(() => video.pause()).catch(() => {})
+
+    // Ships as preload="none" so it costs nothing on first paint. The download
+    // only starts once the stage is within a screen of the viewport — by the
+    // time the visitor scrolls into it, it is buffered and ready to scrub.
+    let prime
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return
+        if (video.preload !== 'auto') {
+          video.preload = 'auto'
+          video.load()
+        }
+        prime = video.play().then(() => video.pause()).catch(() => {})
+        io.disconnect()
+      },
+      { rootMargin: '100% 0px' },
+    )
+    io.observe(video)
+
     return () => {
       video.removeEventListener('loadeddata', onReady)
+      io.disconnect()
       void prime
     }
   }, [])
@@ -213,7 +232,7 @@ function ScrubStage() {
           poster={POSTER}
           muted
           playsInline
-          preload="auto"
+          preload="none"
           aria-hidden="true"
           tabIndex={-1}
         />

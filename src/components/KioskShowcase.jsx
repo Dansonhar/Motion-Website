@@ -116,9 +116,28 @@ function ScrubStage() {
     if (!video) return
     const onReady = () => setReady(true)
     video.addEventListener('loadeddata', onReady)
-    const prime = video.play().then(() => video.pause()).catch(() => {})
+
+    // Ships as preload="none" so it costs nothing on first paint. The download
+    // only starts once the stage is within a screen of the viewport — by the
+    // time the visitor scrolls into it, it is buffered and ready to scrub.
+    let prime
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return
+        if (video.preload !== 'auto') {
+          video.preload = 'auto'
+          video.load()
+        }
+        prime = video.play().then(() => video.pause()).catch(() => {})
+        io.disconnect()
+      },
+      { rootMargin: '100% 0px' },
+    )
+    io.observe(video)
+
     return () => {
       video.removeEventListener('loadeddata', onReady)
+      io.disconnect()
       void prime
     }
   }, [])
@@ -163,7 +182,7 @@ function ScrubStage() {
           poster={POSTER}
           muted
           playsInline
-          preload="auto"
+          preload="none"
           aria-hidden="true"
           tabIndex={-1}
         />

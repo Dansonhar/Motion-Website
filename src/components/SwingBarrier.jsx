@@ -12,10 +12,10 @@ const POSTER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1920' height='1080'%3E%3Crect width='1920' height='1080' fill='%23060807'/%3E%3C/svg%3E"
 
 const HIGHLIGHTS = [
-  { icon: Lightbulb, title: 'LED Status Indicator', text: 'A full-height light strip shows green to pass and red to stop, readable across the floor.' },
-  { icon: Wrench, title: 'Stainless Steel Arms', text: 'Three solid drop-arms on a stainless mechanism, built for constant peak-hour use.' },
-  { icon: Ruler, title: 'Compact Modern Design', text: 'A slim footprint that fits tight entrances without crowding the lobby.' },
-  { icon: ShieldCheck, title: 'One Person Per Unlock', text: 'The arm releases for a single verified entry, then locks again behind them.' },
+  { icon: Lightbulb, title: 'LED Status Indicator', text: 'A lit strip across the top of each pedestal shows green to pass and red to stop, readable from down the queue.' },
+  { icon: Ruler, title: '1000 mm Passage Width', text: 'A wide swing lane that takes gym bags, prams and wheelchairs without a separate accessible gate.' },
+  { icon: Wrench, title: '24V Brushless Motor', text: 'A brushless drive rated for constant peak-hour use, drawing 20W and running on 110V or 220V.' },
+  { icon: ShieldCheck, title: 'One Person Per Unlock', text: 'The panels swing open for a single verified entry at up to 40 people a minute, then close behind them.' },
 ]
 
 function usePrefersReducedMotion() {
@@ -68,7 +68,7 @@ function BarrierCaption() {
           Entrance Hardware
         </p>
         <h2 className="text-4xl font-bold tracking-tight sm:text-6xl">
-          Tripod Turnstile
+          Swing Turnstile
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">
           The gate that turns a verified face into a single, secure entry.
@@ -86,13 +86,13 @@ function SimpleStage() {
       <video
         className="aspect-video w-full object-contain"
         src={`${import.meta.env.BASE_URL}video/gym/swing-barrier.mp4`}
-        poster={POSTER}
+        poster={`${import.meta.env.BASE_URL}video/gym/swing-barrier-poster.jpg`}
         autoPlay
         muted
         loop
         playsInline
         preload="metadata"
-        aria-label="Tripod turnstile promotional video"
+        aria-label="Swing turnstile promotional video"
       />
     </section>
   )
@@ -115,9 +115,28 @@ function ScrubStage() {
     if (!video) return
     const onReady = () => setReady(true)
     video.addEventListener('loadeddata', onReady)
-    const prime = video.play().then(() => video.pause()).catch(() => {})
+
+    // Ships as preload="none" so it costs nothing on first paint. The download
+    // only starts once the stage is within a screen of the viewport — by the
+    // time the visitor scrolls into it, it is buffered and ready to scrub.
+    let prime
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return
+        if (video.preload !== 'auto') {
+          video.preload = 'auto'
+          video.load()
+        }
+        prime = video.play().then(() => video.pause()).catch(() => {})
+        io.disconnect()
+      },
+      { rootMargin: '100% 0px' },
+    )
+    io.observe(video)
+
     return () => {
       video.removeEventListener('loadeddata', onReady)
+      io.disconnect()
       void prime
     }
   }, [])
@@ -159,10 +178,10 @@ function ScrubStage() {
           ref={videoRef}
           className="h-full w-full object-contain"
           src={`${import.meta.env.BASE_URL}video/gym/swing-barrier.mp4`}
-          poster={POSTER}
+          poster={`${import.meta.env.BASE_URL}video/gym/swing-barrier-poster.jpg`}
           muted
           playsInline
-          preload="auto"
+          preload="none"
           aria-hidden="true"
           tabIndex={-1}
         />

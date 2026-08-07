@@ -302,18 +302,26 @@ function usePrefersReducedMotion() {
   return reduced
 }
 
-/* Autoplay can be refused (data saver, low power mode). Retry once the element
-   is in view so a clip never sits on a frozen poster. */
+/* Below-the-fold clips ship with preload="none" so they cost nothing on first
+   paint — otherwise every video on the page competes with the hero for
+   bandwidth. This starts the download once the clip is within a screen of the
+   viewport, then plays it. Autoplay can still be refused (data saver, low
+   power mode), so the observer retries rather than firing once. */
 function useAutoplay(reduced) {
   const ref = useRef(null)
   useEffect(() => {
     const v = ref.current
     if (!v || reduced) return
-    const tryPlay = () => v.play().catch(() => {})
-    tryPlay()
+    const start = () => {
+      if (v.preload !== 'auto') {
+        v.preload = 'auto'
+        v.load()
+      }
+      v.play().catch(() => {})
+    }
     const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && tryPlay()),
-      { threshold: 0.25 },
+      (entries) => entries.forEach((e) => e.isIntersecting && start()),
+      { rootMargin: '100% 0px' },
     )
     io.observe(v)
     return () => io.disconnect()
@@ -338,11 +346,10 @@ function ChannelBox({ channel, index, reduced }) {
           className="aspect-video w-full object-contain"
           src={`${BASE}video/themepark/${channel.src}`}
           poster={POSTER}
-          autoPlay={!reduced}
           muted
           loop
           playsInline
-          preload="auto"
+          preload="none"
           aria-label={`${channel.title} ticketing`}
         />
         <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-semibold tracking-widest text-white/80 backdrop-blur">
@@ -395,7 +402,7 @@ function HardwareBlock({
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className={flip ? 'lg:order-2' : ''}
         >
-          <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-white/45">
+          <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-white/55">
             {eyebrow}
           </p>
           <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
@@ -438,11 +445,10 @@ function HardwareBlock({
             className="aspect-video w-full object-contain"
             src={`${BASE}video/themepark/${video}`}
             poster={`${BASE}video/themepark/${poster}`}
-            autoPlay={!reduced}
-            muted
+              muted
             loop
             playsInline
-            preload="auto"
+            preload="none"
             aria-label={alt}
           />
         </motion.div>
@@ -517,7 +523,7 @@ export default function ThemeParkSite() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="mx-auto max-w-3xl text-center"
           >
-            <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-white/45">
+            <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-white/55">
               Four channels, one platform
             </p>
             <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
@@ -568,7 +574,7 @@ export default function ThemeParkSite() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="max-w-2xl"
           >
-            <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-white/45">
+            <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-white/55">
               From purchase to gate
             </p>
             <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">

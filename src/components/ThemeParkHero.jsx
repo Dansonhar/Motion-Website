@@ -82,7 +82,7 @@ function Scene({ progress, range, className = '', children }) {
   const opacity = useTransform(progress, range, [0, 1, 1, 0])
   const y = useTransform(progress, [range[0], range[3]], [40, -40])
   return (
-    <motion.div style={{ opacity, y }} className={`absolute inset-0 flex items-center ${className}`}>
+    <motion.div style={{ opacity, y }} className={`absolute inset-0 flex items-center [text-shadow:0_1px_3px_rgba(0,0,0,0.95),0_3px_12px_rgba(0,0,0,0.85),0_10px_40px_rgba(0,0,0,0.7)] ${className}`}>
       {children}
     </motion.div>
   )
@@ -167,10 +167,10 @@ function ScrollHero() {
           tabIndex={-1}
         />
 
-        {/* Readability overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/55 to-ink-950/15" />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink-950 to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ink-950/70 to-transparent" />
+        {/* No scrims over the video at all — the footage shows at full
+            brightness. Legibility is carried entirely by the copy's own
+            text-shadow (see Scene), which only darkens the pixels immediately
+            behind the letters instead of dimming the frame. */}
 
         <div className="absolute inset-0">
           <div className="relative mx-auto h-full max-w-7xl px-5 sm:px-8">
@@ -197,7 +197,7 @@ function ScrollHero() {
 
         <motion.div
           style={{ opacity: hintOpacity }}
-          className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 text-white/50"
+          className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 rounded-full bg-ink-950/55 px-4 py-2 text-white backdrop-blur-sm"
         >
           <span className="text-[11px] font-medium uppercase tracking-widest">
             Scroll to explore
@@ -249,10 +249,10 @@ function MobileHero() {
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-500/15 text-accent-400 ring-1 ring-accent-500/25">
                 <s.icon size={20} strokeWidth={1.8} />
               </span>
-              <span className="text-2xl font-bold text-white/15">{s.step}</span>
+              <span className="text-2xl font-bold text-white/70">{s.step}</span>
             </div>
             <h2 className="text-xl font-bold tracking-tight">{s.title}</h2>
-            <p className="mt-1.5 text-sm leading-relaxed text-white/65">{s.text}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-white/90">{s.text}</p>
           </motion.article>
         ))}
       </div>
@@ -265,7 +265,7 @@ function StaticHero() {
   return (
     <section id="park-top" className="relative flex min-h-[92svh] items-center overflow-hidden bg-ink-950">
       <img src={POSTER} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-r from-ink-950/90 via-ink-950/55 to-ink-950/20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-ink-950/45 via-transparent to-transparent" />
       <div className="relative z-10 mx-auto w-full max-w-7xl px-5 sm:px-8">
         <IntroCopy />
       </div>
@@ -277,7 +277,7 @@ function IntroCopy({ compact = false }) {
   return (
     <div className={compact ? '' : 'mx-auto max-w-2xl md:mx-0'}>
       <p
-        className={`mb-4 inline-flex items-center gap-2 rounded-full border border-accent-500/30 bg-accent-500/10 px-4 py-1.5 font-semibold uppercase tracking-widest text-accent-300 ${
+        className={`mb-4 inline-flex items-center gap-2 rounded-full border border-white/30 bg-ink-950/60 backdrop-blur-md px-4 py-1.5 font-semibold uppercase tracking-widest text-white ${
           compact ? 'text-[10px]' : 'text-xs'
         }`}
       >
@@ -294,7 +294,7 @@ function IntroCopy({ compact = false }) {
         <span className="text-accent-400">One System</span>
       </h1>
       <p
-        className={`mt-5 leading-relaxed text-white/75 ${
+        className={`mt-5 leading-relaxed text-white ${
           compact ? 'mx-auto max-w-sm text-[0.95rem]' : 'mx-auto max-w-xl text-base sm:text-lg md:mx-0'
         }`}
       >
@@ -312,10 +312,10 @@ function StepScene({ icon: Icon, step, title, text, cta }) {
         <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-500/15 text-accent-400 ring-1 ring-accent-500/25 backdrop-blur-sm">
           <Icon size={30} strokeWidth={1.8} />
         </span>
-        <span className="text-6xl font-bold text-white/10">{step}</span>
+        <span className="text-6xl font-bold text-white/70">{step}</span>
       </div>
       <h2 className="text-4xl font-bold tracking-tight sm:text-6xl">{title}</h2>
-      <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-white/75 sm:text-lg md:mx-0">
+      <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-white sm:text-lg md:mx-0">
         {text}
       </p>
       {cta && (

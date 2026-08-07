@@ -2,11 +2,9 @@ import { motion } from 'framer-motion'
 import { ScanLine } from 'lucide-react'
 import { useAttraction } from '../attractions.jsx'
 
-const COLUMNS = [
-  {
-    heading: 'Solutions',
-    links: ['Membership Kiosk', 'Tripod Turnstile', 'Face Recognition', 'AI Monitoring'],
-  },
+// Company/Resources are generic across every attraction; only "Solutions"
+// is product-specific, so it comes from each attraction's own `footer` field.
+const SHARED_COLUMNS = [
   {
     heading: 'Company',
     links: ['About', 'Contact', 'Support', 'Partners'],
@@ -19,6 +17,13 @@ const COLUMNS = [
 
 export default function Footer() {
   const { current } = useAttraction()
+  const blurb =
+    current.footer?.blurb ??
+    'A connected access system pairing self-service kiosks with secure, verified entry.'
+  const columns = [
+    { heading: 'Solutions', links: current.footer?.solutions ?? [] },
+    ...SHARED_COLUMNS,
+  ]
   return (
     <footer className="border-t border-white/8 bg-ink-950 px-5 py-16 sm:px-8">
       <motion.div
@@ -40,12 +45,11 @@ export default function Footer() {
               </span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/50">
-              A connected gym entrance system pairing self-service kiosks with
-              face-verified tripod turnstiles and AI tailgating detection.
+              {blurb}
             </p>
           </div>
 
-          {COLUMNS.map((column) => (
+          {columns.map((column) => (
             <div key={column.heading}>
               <h3 className="text-sm font-semibold text-white">
                 {column.heading}
@@ -67,7 +71,10 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/8 pt-8 text-sm text-white/40 sm:flex-row">
-          <p>© 2026 GymAccess. All rights reserved.</p>
+          <p>
+            © 2026 {current.brandA}
+            {current.brandB}. All rights reserved.
+          </p>
           <div className="flex gap-6">
             <a href="#top" className="transition-colors hover:text-white/70">
               Privacy

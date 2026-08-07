@@ -5,14 +5,12 @@ import {
   Smartphone,
   ScanFace,
   ShieldCheck,
-  DoorOpen,
-  ScanEye,
-  Send,
+  MonitorCheck,
 } from 'lucide-react'
 
 // The video's opening frame, shown immediately as the first impression so the
 // gym scene is on screen before the scrub video primes/paints (no dark flash).
-const POSTER = `${import.meta.env.BASE_URL}video/gym-hero-poster.jpg`
+const POSTER = `${import.meta.env.BASE_URL}video/gym/hero-poster.jpg`
 
 // The entry journey. Desktop maps these onto scroll-timed scenes over the
 // scrubbing video; phones render them as a readable list under an autoplaying
@@ -20,33 +18,23 @@ const POSTER = `${import.meta.env.BASE_URL}video/gym-hero-poster.jpg`
 const STEPS = [
   {
     icon: Smartphone, step: '01', title: 'Join From the App',
-    text: 'Members sign up on their phone and confirm who they are with a quick face scan — registered before they reach the desk.',
-    range: [0.10, 0.14, 0.24, 0.29],
+    text: 'Members sign up on their phone and pick a plan — no forms at the front desk, no waiting for staff.',
+    range: [0.09, 0.13, 0.24, 0.29],
   },
   {
-    icon: ScanFace, step: '02', title: 'Enrol at the Kiosk',
-    text: 'One capture at the self-service kiosk registers their face and arms Face ID check-in for every future visit.',
-    range: [0.29, 0.33, 0.46, 0.51],
+    icon: ScanFace, step: '02', title: 'Verify With Face ID',
+    text: 'A quick face scan in the app confirms the person signing up is really them.',
+    range: [0.29, 0.32, 0.40, 0.44],
   },
   {
-    icon: ShieldCheck, step: '03', title: 'Face Verified at the Gate',
-    text: 'The terminal matches face to membership and grants access instantly — no card, no phone, no queue.',
-    range: [0.51, 0.55, 0.62, 0.66],
+    icon: MonitorCheck, step: '03', title: 'Enrol at the Kiosk',
+    text: 'One capture at the self-service kiosk registers their face and arms Face ID entry for every future visit.',
+    range: [0.45, 0.49, 0.78, 0.83],
   },
   {
-    icon: DoorOpen, step: '04', title: 'Walk Straight Through',
-    text: 'The tripod turnstile releases for one authorised entry, then locks again behind them.',
-    range: [0.66, 0.69, 0.74, 0.78],
-  },
-  {
-    icon: ScanEye, step: '05', title: 'QSentry AI Detects Every Entry',
-    text: 'Every person in the lane is detected, matched to a member name and confirmed in real time — so you always know exactly who is inside.',
-    range: [0.775, 0.80, 0.87, 0.895],
-  },
-  {
-    icon: Send, step: '06', title: 'Instant Alerts to Telegram',
-    text: 'If someone tailgates, QSentry AI pushes a Telegram alert with photo and video evidence — so owners can see exactly what happened at any outlet, from anywhere.',
-    range: [0.895, 0.92, 0.99, 1], cta: true,
+    icon: ShieldCheck, step: '04', title: 'Face Verified, Access Granted',
+    text: 'The gate terminal matches face to membership and opens instantly — no card, no phone, no queue.',
+    range: [0.84, 0.88, 0.98, 1], cta: true,
   },
 ]
 
@@ -107,7 +95,7 @@ function MobileHero() {
     <section id="top" className="relative bg-ink-950 pt-16">
       <video
         className="aspect-video w-full object-contain"
-        src={`${import.meta.env.BASE_URL}video/gym-hero.mp4`}
+        src={`${import.meta.env.BASE_URL}video/gym/hero.mp4`}
         poster={POSTER}
         autoPlay
         muted
@@ -128,8 +116,8 @@ function MobileHero() {
           <span className="text-accent-400">Starts Here</span>
         </h1>
         <p className="mx-auto mt-4 max-w-sm text-[0.95rem] leading-relaxed text-white/75">
-          Members enrol their face once, then walk straight in — while AI watches
-          every entry and flags anyone who slips through.
+          Members join in the app, enrol their face at the kiosk, then walk
+          straight in — no card, no phone, no queue.
         </p>
         <div className="mt-7 flex flex-col gap-3">
           <a
@@ -224,7 +212,7 @@ function ScrollHero() {
   const hintOpacity = useTransform(scrollYProgress, [0, 0.04], [1, 0])
 
   return (
-    <section ref={containerRef} id="top" className="relative h-[640vh] bg-ink-950">
+    <section ref={containerRef} id="top" className="relative h-[500vh] bg-ink-950">
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         {/* First-impression frame — visible instantly, under the video */}
         <img
@@ -237,7 +225,7 @@ function ScrollHero() {
         <video
           ref={videoRef}
           className="absolute inset-0 h-full w-full object-cover"
-          src={`${import.meta.env.BASE_URL}video/gym-hero.mp4`}
+          src={`${import.meta.env.BASE_URL}video/gym/hero.mp4`}
           poster={POSTER}
           muted
           playsInline
@@ -254,11 +242,9 @@ function ScrollHero() {
         {/* Scenes */}
         <div className="absolute inset-0">
           <div className="relative mx-auto h-full max-w-7xl px-5 sm:px-8">
-            {/* Scene windows are timed to the footage: app sign-up (~0.06–0.26),
-                kiosk face registration (~0.30–0.48), face verification at the
-                gate (~0.54–0.62), turnstile passage (~0.66–0.75), the QSentry
-                detection panel (~0.78–0.88), then the tailgating alert on the
-                phone (~0.90–1.0). */}
+            {/* Scene windows are timed to the footage: app sign-up (~0.10–0.28),
+                in-app face verification (~0.30–0.42), kiosk face enrolment
+                (~0.45–0.82), then the gate terminal granting access (~0.84–1.0). */}
             <Scene
               progress={scrollYProgress}
               range={[-0.05, 0, 0.05, 0.10]}
@@ -313,8 +299,8 @@ function IntroScene() {
         <span className="text-accent-400">Starts Here</span>
       </h1>
       <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg md:mx-0">
-        Members enrol their face once, then walk straight in — while AI watches
-        every entry and flags anyone who slips through.
+        Members join in the app, enrol their face at the kiosk, then walk
+        straight in — no card, no phone, no queue.
       </p>
       <div className="mt-9 flex flex-col items-center gap-4 sm:flex-row md:items-start">
         <a
@@ -375,7 +361,7 @@ function StaticHero() {
       />
       <video
         className="absolute inset-0 h-full w-full object-cover"
-        src={`${import.meta.env.BASE_URL}video/gym-hero.mp4`}
+        src={`${import.meta.env.BASE_URL}video/gym/hero.mp4`}
         poster={POSTER}
         muted
         playsInline

@@ -83,7 +83,7 @@ export default function Navbar() {
                   role="menu"
                   className="absolute left-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-2xl border border-white/10 bg-ink-900/95 p-1.5 shadow-2xl backdrop-blur-xl"
                 >
-                  {attractions.filter((a) => !a.hidden).map((a) => {
+                  {attractions.map((a) => {
                     const active = a.id === current.id
                     return (
                       <li key={a.id}>

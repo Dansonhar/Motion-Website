@@ -45,7 +45,7 @@ export default function KioskHero() {
         </motion.div>
 
         <motion.img
-          src={`${BASE}kiosk-parts/kiosk-assembled.png`}
+          src={`${BASE}images/kiosk/assembled.png`}
           alt="Self-service kiosk"
           style={{ y, scale }}
           initial={{ opacity: 0, y: 40 }}

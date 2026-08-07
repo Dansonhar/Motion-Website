@@ -16,6 +16,11 @@ export const ATTRACTIONS = [
       { label: 'Hardware', href: '#hardware' },
       { label: 'Contact', href: '#contact' },
     ],
+    footer: {
+      blurb:
+        'A connected gym entrance system pairing self-service kiosks with face-verified tripod turnstiles and AI tailgating detection.',
+      solutions: ['Membership Kiosk', 'Tripod Turnstile', 'Face Recognition', 'AI Monitoring'],
+    },
   },
   {
     id: 'kiosk',
@@ -28,17 +33,28 @@ export const ATTRACTIONS = [
       { label: 'Modules', href: '#parts' },
       { label: 'Contact', href: '#kiosk-contact' },
     ],
+    footer: {
+      blurb:
+        'A self-service ordering kiosk built from six clean modules — display, payments, printing and a rock-solid stand.',
+      solutions: ['Touch Display', 'Card Terminal', 'Printer & NFC', 'Pedestal Base'],
+    },
   },
   {
     id: 'themepark',
     label: 'Theme Park',
     brandA: 'Park',
     brandB: 'Access',
-    available: false,
-    // Pure fullscreen cinematic experience — no page sections to link to, and
-    // the shared footer's copy is Gym-specific, so both are hidden.
-    links: [],
-    noFooter: true,
+    available: true,
+    links: [
+      { label: 'Ticketing', href: '#park-channels' },
+      { label: 'Gates', href: '#top' },
+      { label: 'Contact', href: '#top' },
+    ],
+    footer: {
+      blurb:
+        'A connected theme park platform — tickets, food, retail and gate entry running on one system.',
+      solutions: ['Mobile App', 'Self-Service Kiosk', 'Counter POS', 'Online Webstore'],
+    },
   },
   {
     id: 'mostar',
@@ -79,10 +95,14 @@ export function AttractionProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }
 
+  // `current` resolves against the full list so a hidden attraction still
+  // renders if selected directly; `attractions` is the switcher-facing list,
+  // filtered here so every switcher hides the same entries by default.
   const current = ATTRACTIONS.find((a) => a.id === id) || ATTRACTIONS[0]
+  const attractions = ATTRACTIONS.filter((a) => !a.hidden)
 
   return (
-    <AttractionContext.Provider value={{ current, setAttraction, attractions: ATTRACTIONS }}>
+    <AttractionContext.Provider value={{ current, setAttraction, attractions }}>
       {children}
     </AttractionContext.Provider>
   )

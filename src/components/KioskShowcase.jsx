@@ -86,7 +86,7 @@ function SimpleStage() {
     <section id="solutions-kiosk" className="relative w-full bg-ink-950">
       <video
         className="aspect-video w-full object-contain"
-        src={`${import.meta.env.BASE_URL}video/kiosk.mp4`}
+        src={`${import.meta.env.BASE_URL}video/gym/kiosk-showcase.mp4`}
         poster={POSTER}
         autoPlay
         muted
@@ -159,7 +159,7 @@ function ScrubStage() {
         <video
           ref={videoRef}
           className="h-full w-full object-contain"
-          src={`${import.meta.env.BASE_URL}video/kiosk.mp4`}
+          src={`${import.meta.env.BASE_URL}video/gym/kiosk-showcase.mp4`}
           poster={POSTER}
           muted
           playsInline

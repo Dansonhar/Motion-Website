@@ -89,7 +89,7 @@ function SimpleStage() {
     <section id="qsentry" className="relative w-full bg-ink-950">
       <video
         className="aspect-video w-full object-contain"
-        src={`${import.meta.env.BASE_URL}video/qsentry.mp4`}
+        src={`${import.meta.env.BASE_URL}video/gym/qsentry.mp4`}
         poster={POSTER}
         autoPlay
         muted
@@ -162,7 +162,7 @@ function ScrubStage() {
         <video
           ref={videoRef}
           className="h-full w-full object-contain"
-          src={`${import.meta.env.BASE_URL}video/qsentry.mp4`}
+          src={`${import.meta.env.BASE_URL}video/gym/qsentry.mp4`}
           poster={POSTER}
           muted
           playsInline

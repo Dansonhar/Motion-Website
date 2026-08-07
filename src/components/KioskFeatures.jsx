@@ -49,7 +49,7 @@ function Row({ part, i }) {
       >
         <div className="absolute h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.1),transparent_70%)] blur-2xl" />
         <img
-          src={`${BASE}kiosk-parts/${part.src}`}
+          src={`${BASE}images/kiosk/${part.src}`}
           alt={part.title}
           loading="lazy"
           className="relative max-h-full w-auto object-contain [filter:drop-shadow(0_24px_34px_rgba(0,0,0,0.55))]"

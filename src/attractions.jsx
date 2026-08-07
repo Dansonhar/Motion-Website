@@ -47,13 +47,20 @@ export const ATTRACTIONS = [
     available: true,
     links: [
       { label: 'Ticketing', href: '#park-channels' },
-      { label: 'Gates', href: '#top' },
+      { label: 'Kiosk', href: '#park-kiosk' },
+      { label: 'Gates', href: '#park-gates' },
       { label: 'Contact', href: '#top' },
     ],
     footer: {
       blurb:
         'A connected theme park platform — tickets, food, retail and gate entry running on one system.',
-      solutions: ['Mobile App', 'Self-Service Kiosk', 'Counter POS', 'Online Webstore'],
+      solutions: [
+        'Mobile App',
+        'Self-Service Kiosk',
+        'Counter POS',
+        'Online Webstore',
+        'Tripod Turnstile',
+      ],
     },
   },
   {

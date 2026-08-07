@@ -57,8 +57,55 @@ export default function QSentry() {
     <>
       {simple ? <SimpleStage /> : <ScrubStage />}
       <SentryCaption />
+      <DetectionClip />
       <Highlights />
     </>
+  )
+}
+
+/* Real detection footage from the QSentry monitor, shown straight after the
+   feature video. The clip is a 1562x1080 UI capture, not 16:9 — the frame is
+   locked to its native ratio so the timestamp, the "QSENTRY AI" label and the
+   TAILGATING DETECTED banner are never cropped. */
+function DetectionClip() {
+  return (
+    <section className="relative bg-ink-950 px-5 pt-12 sm:px-8 sm:pt-16">
+      <div className="mx-auto max-w-3xl">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <p className="mb-3 text-center text-[11px] font-semibold uppercase tracking-[0.3em] text-accent-400">
+            Caught on camera
+          </p>
+          <h3 className="text-center text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+            This is what a tailgate looks like.
+          </h3>
+          <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-relaxed text-white/60 sm:text-base">
+            One member taps in and walks through. A second person slips through
+            behind him on the same rotation — no tap, no membership. QSentry
+            flags it in the same second, boxes the person who did it and stamps
+            the exact time.
+          </p>
+
+          <div className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl">
+            <video
+              className="aspect-[1562/1080] w-full object-contain"
+              src={`${import.meta.env.BASE_URL}video/gym/qsentry-detect.mp4`}
+              poster={`${import.meta.env.BASE_URL}video/gym/qsentry-detect-poster.jpg`}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label="QSentry AI monitor detecting a tailgater at a turnstile"
+            />
+          </div>
+        </motion.div>
+      </div>
+    </section>
   )
 }
 

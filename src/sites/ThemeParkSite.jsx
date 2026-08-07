@@ -80,36 +80,143 @@ const CAPABILITIES = [
 ]
 
 // The journey the hero footage shows, as a continuously travelling marquee.
-// Titles only — a `src` can be added per stage later to drop a clip into the card.
 const JOURNEY = [
-  { step: '01', title: 'Buy Anywhere' },
-  { step: '02', title: 'Ticket Issued Instantly' },
-  { step: '03', title: 'Scan and Walk In' },
-  { step: '04', title: 'Everything Reconciles Itself' },
+  { step: '01', title: 'Buy Anywhere', img: 'journey-1-buy.jpg' },
+  { step: '02', title: 'Ticket Issued Instantly', img: 'journey-2-issued.jpg' },
+  { step: '03', title: 'Scan and Walk In', img: 'journey-3-scan.jpg' },
+  { step: '04', title: 'Everything Reconciles Itself', img: 'journey-4-dashboard.jpg' },
 ]
 
-/* One marquee cell. Kept deliberately simple so a video can slot in above the
-   title without changing the track maths. */
+/* One marquee cell: image above, step + title below. Fixed width so the track
+   maths stay predictable; the source images differ in aspect so the frame is
+   locked to 4:3 and cropped to fill. */
 function JourneyCell({ stage }) {
   return (
-    <div className="flex w-[300px] shrink-0 flex-col justify-center sm:w-[380px]">
-      <div className="flex items-center gap-3">
-        <span className="text-xs font-semibold tracking-[0.3em] text-accent-400">
-          {stage.step}
-        </span>
-        <span className="h-px flex-1 bg-white/10" />
+    <figure className="flex w-[260px] shrink-0 flex-col sm:w-[340px] lg:w-[400px]">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl">
+        <img
+          src={`${BASE}images/themepark/${stage.img}`}
+          alt={stage.title}
+          loading="lazy"
+          draggable="false"
+          className="aspect-[4/3] w-full select-none object-cover"
+        />
       </div>
-      <h3 className="mt-4 whitespace-nowrap text-xl font-semibold tracking-tight text-white sm:text-2xl">
-        {stage.title}
-      </h3>
-    </div>
+      <figcaption className="mt-5">
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-semibold tracking-[0.3em] text-accent-400">
+            {stage.step}
+          </span>
+          <span className="h-px flex-1 bg-white/10" />
+        </div>
+        {/* wraps rather than nowrap — a long title would otherwise spill out of
+            the fixed-width cell and collide with the next one */}
+        <h3 className="mt-3 text-lg font-semibold tracking-tight text-white sm:text-xl">
+          {stage.title}
+        </h3>
+      </figcaption>
+    </figure>
   )
 }
 
-/* Infinite left-to-right marquee. The track holds two identical copies of the
-   list, so animating x from -50% to 0 travels exactly one copy and loops with
-   no visible seam. */
+/* Infinite right-to-left marquee that the visitor can also scrub by hand.
+
+   Built on a real overflow-x scroller rather than a keyframe animation: a
+   keyframe can't be grabbed mid-flight and resumed from wherever the user let
+   go, but `scrollLeft` can. A rAF loop nudges scrollLeft forward each frame —
+   increasing scrollLeft reveals content further right, so the cards travel
+   leftwards (right-to-left).
+
+   Manual control comes free on touch and trackpad; a pointer-drag handler adds
+   it for mouse. Any interaction parks the autoplay, which restarts RESUME_MS
+   after the visitor stops.
+
+   Three identical copies are rendered so there is always a full copy of
+   headroom either side of the visible window; the loop keeps scrollLeft inside
+   the middle copy, and because the copies are identical, wrapping by exactly
+   one period is invisible.
+
+   Card order is plain JOURNEY order: reading left-to-right the steps run
+   01→04, and because new cards enter from the RIGHT they also *arrive* 01→04.
+   Both readings ascend, so no reversal is needed. */
+const SPEED = 65 // px per second
+const RESUME_MS = 1200
+
 function JourneyMarquee({ reduced }) {
+  const scrollerRef = useRef(null)
+  const pausedUntilRef = useRef(0)
+  const dragRef = useRef(null)
+  const [grabbing, setGrabbing] = useState(false)
+
+  useEffect(() => {
+    const el = scrollerRef.current
+    if (!el || reduced) return
+
+    // Exact loop period: the gap sits *between* every card, so scrollWidth/3
+    // would be short by a third of a gap and drift. Measure it off the DOM.
+    let period = 0
+    const measure = () => {
+      const kids = el.children
+      period = kids[JOURNEY.length]
+        ? kids[JOURNEY.length].offsetLeft - kids[0].offsetLeft
+        : 0
+      // Park in the middle copy so there's room to drag backwards.
+      if (period && el.scrollLeft < period) el.scrollLeft = period
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+
+    let last = performance.now()
+    let raf = requestAnimationFrame(function tick(now) {
+      const dt = Math.min((now - last) / 1000, 0.05) // clamp after tab-away
+      last = now
+      if (!dragRef.current && now >= pausedUntilRef.current) {
+        el.scrollLeft += SPEED * dt
+      }
+      if (period > 0) {
+        if (el.scrollLeft >= period * 2) el.scrollLeft -= period
+        else if (el.scrollLeft < period) el.scrollLeft += period
+      }
+      raf = requestAnimationFrame(tick)
+    })
+
+    return () => {
+      cancelAnimationFrame(raf)
+      ro.disconnect()
+    }
+  }, [reduced])
+
+  const hold = () => {
+    pausedUntilRef.current = Infinity
+  }
+  const release = () => {
+    pausedUntilRef.current = performance.now() + RESUME_MS
+  }
+
+  const onPointerDown = (e) => {
+    hold()
+    if (e.pointerType !== 'mouse') return // touch scrolls natively
+    dragRef.current = { x: e.clientX, left: scrollerRef.current.scrollLeft }
+    scrollerRef.current.setPointerCapture(e.pointerId)
+    setGrabbing(true)
+  }
+  const onPointerMove = (e) => {
+    const drag = dragRef.current
+    if (!drag) return
+    scrollerRef.current.scrollLeft = drag.left - (e.clientX - drag.x)
+  }
+  const onPointerUp = () => {
+    dragRef.current = null
+    setGrabbing(false)
+    release()
+  }
+  // Only a sideways wheel/trackpad gesture counts as scrubbing — plain vertical
+  // page scrolling over the row shouldn't stall the loop.
+  const onWheel = (e) => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) release()
+  }
+
   if (reduced) {
     return (
       <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -121,19 +228,67 @@ function JourneyMarquee({ reduced }) {
   }
 
   return (
-    <div className="relative overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)] [-webkit-mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
-      <motion.div
-        className="flex w-max gap-10 sm:gap-16"
-        animate={{ x: ['-50%', '0%'] }}
-        transition={{ duration: 28, ease: 'linear', repeat: Infinity }}
-      >
-        {[...JOURNEY, ...JOURNEY].map((stage, i) => (
-          <JourneyCell key={`${stage.step}-${i}`} stage={stage} />
-        ))}
-      </motion.div>
+    <div
+      ref={scrollerRef}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      onTouchStart={hold}
+      onTouchEnd={release}
+      onWheel={onWheel}
+      className={`flex gap-10 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)] [scrollbar-width:none] [-webkit-mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)] [&::-webkit-scrollbar]:hidden sm:gap-16 ${
+        grabbing ? 'cursor-grabbing' : 'cursor-grab'
+      }`}
+    >
+      {[...JOURNEY, ...JOURNEY, ...JOURNEY].map((stage, i) => (
+        <JourneyCell key={`${stage.step}-${i}`} stage={stage} />
+      ))}
     </div>
   )
 }
+
+// Grounded in what the kiosk footage actually shows — the tile menu, the card
+// terminal and NFC pad, the authorising screen and the ticket coming out.
+const KIOSK_FEATURES = [
+  {
+    title: 'Sells More Than Entry',
+    text: 'Day passes, fast passes, family bundles, locker rental, food vouchers and park maps all sit on one menu, so a guest can arrange the whole visit before they walk in.',
+  },
+  {
+    title: 'Every Way to Pay',
+    text: 'A certified card terminal handles chip and PIN, while the contactless pad on the front takes tap cards and phone wallets.',
+  },
+  {
+    title: 'Ticket Printed on the Spot',
+    text: 'Payment clears and the pass prints from the slot below within seconds — a scannable QR the guest can carry straight to the gate.',
+  },
+  {
+    title: 'Built for the Entrance Plaza',
+    text: 'A sealed outdoor-rated body that stands in the queue line itself, so arrivals buy where they land instead of doubling back to a counter.',
+  },
+]
+
+// Grounded in what the turnstile footage actually shows — the terminal on the
+// mast, the scan pad on the top panel, the LED strip and the tripod arms.
+const GATE_FEATURES = [
+  {
+    title: 'Terminal on the Mast',
+    text: 'A screen at eye level guides the guest and reads face or QR at standing height, so nobody has to crouch or hunt for the reader.',
+  },
+  {
+    title: 'Contactless Scan Pad',
+    text: 'A second reader sits flat on the top panel for wallet passes and printed QR tickets — hold it over the pad and walk.',
+  },
+  {
+    title: 'Status You Can See Down the Queue',
+    text: 'A full-length LED strip runs the height of the column and around the top edge. Green for open, so guests pick a free lane before they reach it.',
+  },
+  {
+    title: 'Tripod Arms, Weatherproof Body',
+    text: 'Three arms release one guest per rotation and the powder-coated body is built to sit outdoors under a canopy all season.',
+  },
+]
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false)
@@ -147,14 +302,12 @@ function usePrefersReducedMotion() {
   return reduced
 }
 
-/* One channel box: a 16:9 clip that loops on its own, with the label below. */
-function ChannelBox({ channel, index, reduced }) {
-  const videoRef = useRef(null)
-
-  // Autoplay can be refused (data saver, low power mode). Retry once the
-  // element is in view so the row never sits on a frozen poster.
+/* Autoplay can be refused (data saver, low power mode). Retry once the element
+   is in view so a clip never sits on a frozen poster. */
+function useAutoplay(reduced) {
+  const ref = useRef(null)
   useEffect(() => {
-    const v = videoRef.current
+    const v = ref.current
     if (!v || reduced) return
     const tryPlay = () => v.play().catch(() => {})
     tryPlay()
@@ -165,6 +318,12 @@ function ChannelBox({ channel, index, reduced }) {
     io.observe(v)
     return () => io.disconnect()
   }, [reduced])
+  return ref
+}
+
+/* One channel box: a 16:9 clip that loops on its own, with the label below. */
+function ChannelBox({ channel, index, reduced }) {
+  const videoRef = useAutoplay(reduced)
 
   return (
     <motion.article
@@ -203,6 +362,92 @@ function ChannelBox({ channel, index, reduced }) {
         <p className="mt-2 text-sm leading-relaxed text-white/55">{channel.text}</p>
       </div>
     </motion.article>
+  )
+}
+
+/* A piece of hardware: looping clip on one side, feature list on the other.
+   `flip` alternates which side the clip lands on so consecutive blocks don't
+   read as the same slab twice. */
+function HardwareBlock({
+  id,
+  eyebrow,
+  title,
+  lead,
+  features,
+  video,
+  poster,
+  alt,
+  flip = false,
+  reduced,
+}) {
+  const videoRef = useAutoplay(reduced)
+
+  return (
+    <div
+      id={id}
+      className="mt-24 scroll-mt-24 border-t border-white/8 pt-16 sm:mt-28 sm:pt-20"
+    >
+      <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className={flip ? 'lg:order-2' : ''}
+        >
+          <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-white/45">
+            {eyebrow}
+          </p>
+          <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            {title}
+          </h2>
+          <p className="mt-4 max-w-lg text-base leading-relaxed text-white/60">
+            {lead}
+          </p>
+
+          <ul className="mt-8 space-y-6">
+            {features.map((f) => (
+              <li key={f.title} className="flex gap-4">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-400" />
+                <div>
+                  <h3 className="text-base font-semibold tracking-tight text-white">
+                    {f.title}
+                  </h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-white/55">
+                    {f.text}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+
+        {/* 16:9 clip in a 16:9 frame — full width, no crop, no letterbox, and
+            nothing printed on the kiosk screens gets clipped. */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.97 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className={`overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl ${
+            flip ? 'lg:order-1' : ''
+          }`}
+        >
+          <video
+            ref={videoRef}
+            className="aspect-video w-full object-contain"
+            src={`${BASE}video/themepark/${video}`}
+            poster={`${BASE}video/themepark/${poster}`}
+            autoPlay={!reduced}
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-label={alt}
+          />
+        </motion.div>
+      </div>
+    </div>
   )
 }
 
@@ -345,6 +590,32 @@ export default function ThemeParkSite() {
             <JourneyMarquee reduced={reduced} />
           </motion.div>
         </div>
+
+        {/* ---- the hardware, in the order a guest meets it ---- */}
+        <HardwareBlock
+          id="park-kiosk"
+          eyebrow="At the entrance"
+          title={<>The kiosk that sells<br />the whole visit.</>}
+          lead="Guests who arrive without a ticket buy one where they are standing. Tickets, passes, lockers and food vouchers on one menu, paid for and printed in under a minute."
+          features={KIOSK_FEATURES}
+          video="kiosk.mp4"
+          poster="kiosk-poster.jpg"
+          alt="Self-service ticketing kiosk at a theme park entrance"
+          reduced={reduced}
+        />
+
+        <HardwareBlock
+          id="park-gates"
+          eyebrow="At the gate"
+          title={<>The turnstile every<br />ticket ends up at.</>}
+          lead="Whichever channel sold the ticket, this is where it gets read. One tripod lane handles face, wallet pass and printed QR, and reports every entry back to the same dashboard."
+          features={GATE_FEATURES}
+          video="turnstile.mp4"
+          poster="turnstile-poster.jpg"
+          alt="Tripod turnstile at a theme park entrance"
+          flip
+          reduced={reduced}
+        />
 
         {/* ---- closing ---- */}
         <motion.div

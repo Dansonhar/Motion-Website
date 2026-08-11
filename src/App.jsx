@@ -6,6 +6,7 @@ import ScrollProgress from './components/ScrollProgress.jsx'
 
 const GymSite = lazy(() => import('./sites/GymSite.jsx'))
 const ThemeParkSite = lazy(() => import('./sites/ThemeParkSite.jsx'))
+const SolutionSite = lazy(() => import('./sites/SolutionSite.jsx'))
 const MostarSite = lazy(() => import('./sites/MostarSite.jsx'))
 const Footer = lazy(() => import('./components/Footer.jsx'))
 
@@ -14,7 +15,9 @@ function Shell() {
   const standalone = Boolean(current.standalone)
 
   const site =
-    current.id === 'themepark' ? (
+    current.id === 'solution' ? (
+      <SolutionSite key="solution" />
+    ) : current.id === 'themepark' ? (
       <ThemeParkSite key="themepark" />
     ) : current.id === 'mostar' ? (
       <MostarSite key="mostar" />

@@ -47,6 +47,34 @@ export const ATTRACTIONS = [
     },
   },
   {
+    id: 'solution',
+    label: 'Solution',
+    brandA: 'Solution',
+    brandB: '',
+    available: true,
+    links: [
+      { label: 'Approach', href: '#approach' },
+      { label: 'Solutions', href: '#solutions' },
+      { label: 'Industries', href: '#industries' },
+      { label: 'Work', href: '#work' },
+      { label: 'About', href: '#about' },
+    ],
+    // This vertical sells a consulting engagement, not a product trial — the
+    // shared "Book a Demo" CTA would undercut the whole positioning.
+    cta: { label: 'Discuss Your Business', href: '#consultation' },
+    footer: {
+      blurb:
+        'We design the business behind the operation — connected systems for restaurants, retail, fitness, leisure and hospitality, built around the way each business needs to work.',
+      solutions: [
+        'Customer Experience',
+        'Operations',
+        'Management & Control',
+        'Revenue & Retention',
+        'Scale',
+      ],
+    },
+  },
+  {
     id: 'mostar',
     label: 'Mostar City',
     brandA: 'Mostar',

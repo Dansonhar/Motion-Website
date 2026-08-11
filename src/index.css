@@ -244,3 +244,13 @@ body {
     animation: none;
   }
 }
+
+/* Hairline rule that opens each Solution section */
+.sol-rule {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.28),
+    rgba(255, 255, 255, 0) 70%
+  );
+}

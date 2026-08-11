@@ -29,6 +29,9 @@ export default function Navbar() {
   }, [attrOpen])
 
   const links = current.links
+  // Per-attraction call to action; verticals that sell a consultation rather
+  // than a product override the default.
+  const cta = current.cta || { label: 'Book a Demo', href: links[links.length - 1]?.href || '#top' }
   const pick = (id) => {
     setAttraction(id)
     setAttrOpen(false)
@@ -128,10 +131,10 @@ export default function Navbar() {
 
         <div className="flex items-center gap-3">
           <a
-            href={links[links.length - 1]?.href || '#top'}
-            className="hidden rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-ink-950 transition-colors hover:bg-accent-400 lg:inline-block"
+            href={cta.href}
+            className="hidden rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-ink-950 [text-shadow:none] transition-colors hover:bg-accent-400 lg:inline-block"
           >
-            Book a Demo
+            {cta.label}
           </a>
           <button
             type="button"
@@ -168,11 +171,11 @@ export default function Navbar() {
               ))}
               <li className="pt-2">
                 <a
-                  href={links[links.length - 1]?.href || '#top'}
+                  href={cta.href}
                   onClick={() => setMenuOpen(false)}
-                  className="block rounded-full bg-accent-500 px-5 py-3.5 text-center text-base font-semibold text-ink-950"
+                  className="block rounded-full bg-accent-500 px-5 py-3.5 text-center text-base font-semibold text-ink-950 [text-shadow:none]"
                 >
-                  Book a Demo
+                  {cta.label}
                 </a>
               </li>
             </ul>

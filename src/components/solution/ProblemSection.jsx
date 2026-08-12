@@ -39,10 +39,18 @@ export default function ProblemSection() {
 
         <div className="lg:col-span-5 lg:pt-4">
           <Reveal delay={0.12}>
+            {/* The still is 16:9, so the frame is too — the slot used to be a
+                4:5 portrait holding nothing, which left most of a screen empty
+                beside the headline. A `wide` frame shows the picture whole and
+                sits at the height of the headline block next to it.
+
+                Passing `image` (not `src`) means no label or caption chrome is
+                drawn over it — the caption becomes the alt text instead. */}
             <CinematicVideo
-              ratio="portrait"
-              label="Film 01"
-              caption="Interior detail — the room, the counter, the quiet before opening"
+              ratio="wide"
+              image={`${import.meta.env.BASE_URL}images/solution/story-01-before-open.jpg`}
+              label="Before opening"
+              caption="A room being set before it trades — staff prepping, counters ready, no customers yet"
               className="rounded-2xl border border-white/10"
             />
           </Reveal>

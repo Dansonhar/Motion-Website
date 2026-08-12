@@ -7,10 +7,10 @@ import { Display, Eyebrow, Lede, Reveal, SectionShell } from './SolutionPrimitiv
    Deliberately near the end of the page, not the front. It is the spec sheet,
    not the pitch: the device, its name, nothing else.
 
-   Stills carry the grid and only one cell moves. Six autoplaying films
-   three-across would make the last section the loudest one and undo the
-   ordering the whole page argues for — so a second film is a decision, not a
-   default.
+   All six cells now autoplay. That is a lot of motion for the last section on a
+   page whose whole argument is that technology comes last — it was a deliberate
+   call, not a drift. Every film is muted, loops, and does not load until its
+   tile is near the viewport, so the cost is attention rather than bandwidth.
 
    Each system is a category, not a product name, and each is deliberately broad
    enough to mean something in any sector — a kiosk sells tickets at an
@@ -52,20 +52,25 @@ const SYSTEMS = [
   /* A cell takes either a still or a film. `video` wins, and `image` is its
      poster so the tile is never empty while the file loads.
 
-     The remaining cells are named and nothing else — add `image: '<file>.jpg'`
-     (in public/images/solution/tech/) or `video: '<file>.mp4'` (in
-     public/video/solution/tech/) to fill any of them and the cell picks it up
-     with no other change.
+     A cell is filled by naming its file: `image: '<file>.jpg'` in
+     public/images/solution/tech/, `video: '<file>.mp4'` in
+     public/video/solution/tech/. Nothing else changes.
 
-     Both films are authored 960x960 and cropped to the tile at encode time,
-     18% down from the top — the same offset for both, so they read as one set
-     rather than two crops. */
-  { id: 'pos', name: 'Point of Sale', video: 'pos.mp4', image: 'pos-poster.jpg' },
+     Every film arrives square — 960x960 or 1080x1080 — and is cropped to the
+     tile at encode time rather than by the browser, so nothing decodes pixels
+     the frame discards. The vertical offset follows what the shot is about:
+     18% where a person carries it (pos, mpos, table), 10% where a screen does
+     (kiosk, qr, online), since a screen needs its top edge kept.
+
+     All six are re-encoded to H.264. One source arrived as HEVC, which Chrome
+     and Firefox will not play in an MP4 at all — it would have shown a black
+     tile everywhere but Safari. Check the codec of anything dropped in here. */
+  { id: 'pos', name: 'POS', video: 'pos.mp4', image: 'pos-poster.jpg' },
   { id: 'mobile-pos', name: 'Mobile POS', video: 'mpos.mp4', image: 'mpos-poster.jpg' },
-  { id: 'table', name: 'Table Ordering' },
-  { id: 'kiosk', name: 'Self-Service Kiosk' },
-  { id: 'qr', name: 'QR Ordering' },
-  { id: 'online', name: 'Online Store' },
+  { id: 'table', name: 'Table Ordering', video: 'table.mp4', image: 'table-poster.jpg' },
+  { id: 'kiosk', name: 'Self-Service Kiosk', video: 'kiosk.mp4', image: 'kiosk-poster.jpg' },
+  { id: 'qr', name: 'QR Ordering', video: 'qr.mp4', image: 'qr-poster.jpg' },
+  { id: 'online', name: 'Webstore', video: 'online.mp4', image: 'online-poster.jpg' },
 ]
 
 export default function TechnologyLayer() {

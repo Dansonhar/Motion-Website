@@ -1,4 +1,5 @@
-import { CinematicVideo } from './SolutionMedia.jsx'
+import { useEffect, useRef } from 'react'
+import { CinematicVideo, usePrefersReducedMotion } from './SolutionMedia.jsx'
 
 const BASE = import.meta.env.BASE_URL
 import { Display, Eyebrow, Reveal, SectionShell } from './SolutionPrimitives.jsx'
@@ -52,10 +53,99 @@ const AREAS = [
   },
 ]
 
+/* Below `lg` the row of films is a horizontal scroller, and a mouse only emits
+   vertical wheel deltas — so without this the strip is unreachable with a mouse.
+   The delta is turned into horizontal movement and eased toward a target rather
+   than applied straight to scrollLeft, which is what makes it glide instead of
+   jumping a notch per click.
+
+   Two rules keep it from feeling like a hijack:
+   - a gesture that is already horizontal (trackpad, shift+wheel) is left alone;
+   - once the strip hits either end the wheel is released back to the page, so
+     scrolling never gets trapped in this section. */
+const EASE_FACTOR = 0.18
+
+function useWheelToHorizontal(reduced) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    let target = null
+    let raf = 0
+
+    const step = () => {
+      // A cancel (touch/pointer) can clear the target between frames; without
+      // this guard `target - scrollLeft` reads null as 0 and eases back to the
+      // start instead of stopping where it is.
+      if (target === null) {
+        raf = 0
+        return
+      }
+      const delta = target - el.scrollLeft
+      if (Math.abs(delta) < 0.5) {
+        el.scrollLeft = target
+        target = null
+        raf = 0
+        return
+      }
+      el.scrollLeft += delta * EASE_FACTOR
+      raf = requestAnimationFrame(step)
+    }
+
+    const onWheel = (e) => {
+      const max = el.scrollWidth - el.clientWidth
+      if (max <= 0) return // lg and up: it's a grid, nothing to scroll
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return // already horizontal
+
+      // Compare against the target, not scrollLeft: mid-ease the strip lags
+      // behind where it is headed, and testing the live position would hand the
+      // gesture to the page while there was still strip left to travel.
+      const from = target ?? el.scrollLeft
+      // Release to the page only once the strip is parked at the end the
+      // gesture is pushing toward.
+      if ((e.deltaY < 0 && from <= 0) || (e.deltaY > 0 && from >= max)) return
+
+      e.preventDefault()
+      // Clamped, so a fast flick settles exactly on the end rather than
+      // overshooting into a range the strip can never reach.
+      target = Math.min(max, Math.max(0, from + e.deltaY))
+      if (reduced) {
+        el.scrollLeft = target
+        target = null
+      } else if (!raf) {
+        raf = requestAnimationFrame(step)
+      }
+    }
+
+    // A touch drag scrolls natively; cancel any in-flight easing so the two
+    // don't fight over scrollLeft.
+    const cancel = () => {
+      target = null
+      if (raf) cancelAnimationFrame(raf)
+      raf = 0
+    }
+
+    el.addEventListener('wheel', onWheel, { passive: false })
+    el.addEventListener('touchstart', cancel, { passive: true })
+    el.addEventListener('pointerdown', cancel, { passive: true })
+    return () => {
+      el.removeEventListener('wheel', onWheel)
+      el.removeEventListener('touchstart', cancel)
+      el.removeEventListener('pointerdown', cancel)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [reduced])
+  return ref
+}
+
 /* ---------------------------------------------------------------------------
    Section 3 — what we actually solve.
    --------------------------------------------------------------------------- */
 export default function SolutionAreas() {
+  const reduced = usePrefersReducedMotion()
+  const stripRef = useWheelToHorizontal(reduced)
+
   return (
     <SectionShell id="solutions" label="What we solve">
       {/* Two lines, not four — the row of films sits directly under this, so
@@ -70,21 +160,25 @@ export default function SolutionAreas() {
       </Reveal>
 
       {/* One row, 01 → 05, every film visible at once. Below `lg` five columns
-          would be unreadable, so the row becomes a snap-scrolling strip — still
-          a single left-to-right row, just dragged rather than seen all at once.
+          would be unreadable, so the row becomes a scrolling strip — still a
+          single left-to-right row, just scrolled rather than seen all at once.
 
           `-mx-6 px-6` lets the strip bleed to the screen edge while keeping the
-          first card aligned to the section's gutter; `scroll-pl-*` matches that
-          gutter, or the snapport would start at the padding edge and card 01
-          would snap flush against the screen edge. */}
+          first card aligned to the section's gutter.
+
+          No scroll-snap: mandatory snapping pulls against the eased wheel
+          motion above and lands with a jerk. Free scrolling is what reads as
+          smooth. `overscroll-x-contain` stops a fast flick at either end from
+          triggering the browser's back-navigation gesture. */}
       <div
-        className="mt-14 -mx-6 flex snap-x snap-mandatory scroll-pl-6 gap-5 overflow-x-auto px-6 pb-4 sm:-mx-10 sm:mt-16 sm:scroll-pl-10 sm:px-10 lg:mx-0 lg:grid lg:grid-cols-5 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0"
+        ref={stripRef}
+        className="mt-14 -mx-6 flex touch-pan-x gap-5 overflow-x-auto overscroll-x-contain px-6 pb-4 sm:-mx-10 sm:mt-16 sm:px-10 lg:mx-0 lg:grid lg:grid-cols-5 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0"
       >
         {AREAS.map((area, i) => (
           <Reveal
             key={area.n}
             delay={i * 0.08}
-            className="w-[74vw] max-w-[320px] shrink-0 snap-start lg:w-auto lg:max-w-none"
+            className="w-[74vw] max-w-[320px] shrink-0 lg:w-auto lg:max-w-none"
           >
             <article className="flex h-full flex-col">
               {/* Vertical footage — a 9:16 frame so nothing is cropped. */}

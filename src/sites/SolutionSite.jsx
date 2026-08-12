@@ -2,7 +2,6 @@ import SolutionHero from '../components/solution/SolutionHero.jsx'
 import ProblemSection from '../components/solution/ProblemSection.jsx'
 import SolutionAreas from '../components/solution/SolutionAreas.jsx'
 import ApproachSection from '../components/solution/ApproachSection.jsx'
-import StoryScroll from '../components/solution/StoryScroll.jsx'
 import OutcomesSection from '../components/solution/OutcomesSection.jsx'
 import TechnologyLayer from '../components/solution/TechnologyLayer.jsx'
 import IndustriesSection from '../components/solution/IndustriesSection.jsx'
@@ -24,8 +23,8 @@ import ConsultationCTA from '../components/solution/ConsultationCTA.jsx'
    not apart from them.
 
    NOTE: no `overflow-*` on this wrapper. `overflow-x: hidden` computes
-   `overflow-y: auto`, which makes it a scroll container and stops StoryScroll's
-   sticky stage from pinning to the viewport.
+   `overflow-y: auto`, which makes it a scroll container and would break any
+   `position: sticky` a section below relies on.
    --------------------------------------------------------------------------- */
 export default function SolutionSite() {
   return (
@@ -35,7 +34,6 @@ export default function SolutionSite() {
         <ProblemSection />
         <SolutionAreas />
         <ApproachSection />
-        <StoryScroll />
         <OutcomesSection />
         <TechnologyLayer />
         <IndustriesSection />

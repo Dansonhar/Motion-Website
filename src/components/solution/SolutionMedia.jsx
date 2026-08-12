@@ -67,6 +67,9 @@ const RATIOS = {
   portrait: 'aspect-[4/5]',
   // 9:16 — matches vertically-shot footage exactly, so nothing is cropped.
   tall: 'aspect-[9/16]',
+  // The technology grid's device frame. Every asset in that grid is authored to
+  // this ratio, so a tile can hold a still or a film and neither is cropped.
+  tile: 'aspect-[683/472]',
   square: 'aspect-square',
   fill: 'h-full w-full',
 }
@@ -127,9 +130,12 @@ export function CinematicVideo({
   src,
   srcMobile,
   poster,
+  posterMobile,
+  image,
   label = 'Video',
   caption,
   ratio = 'wide',
+  ratioMobile,
   overlay = 0,
   className = '',
   children,
@@ -142,15 +148,48 @@ export function CinematicVideo({
   const isMobile = useIsMobile()
   const videoRef = useLazyAutoplay(!reduced)
 
+  /* One `src` attribute is rendered, never two, and `useIsMobile` resolves on
+     the very first render — so a phone fetches only the mobile cut and a
+     desktop only the desktop cut. Never render both behind a CSS `hidden`:
+     that downloads whichever file the viewer will not watch. */
   const resolved = isMobile && srcMobile ? srcMobile : src
+  const resolvedPoster = isMobile && posterMobile ? posterMobile : poster
+  const resolvedRatio = (isMobile && ratioMobile) || ratio
+
+  /* A still fills the same frame as a film — same ratio, same overlay, same
+     children — so a section can be built with either without its layout
+     moving. Film wins if both are supplied. */
+  if (!resolved && image) {
+    return (
+      <div
+        className={`relative overflow-hidden bg-ink-900 ${RATIOS[resolvedRatio]} ${className}`}
+      >
+        <img
+          src={image}
+          alt={caption || label}
+          draggable={false}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+          className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover [-webkit-user-drag:none]"
+        />
+        {overlay > 0 && (
+          <div
+            className="pointer-events-none absolute inset-0 bg-ink-950"
+            style={{ opacity: overlay }}
+          />
+        )}
+        {children && <div className="absolute inset-0">{children}</div>}
+      </div>
+    )
+  }
 
   if (!resolved) {
     return (
-      <div className={`relative ${RATIOS[ratio]} ${className}`}>
+      <div className={`relative ${RATIOS[resolvedRatio]} ${className}`}>
         <VideoPlaceholder
           label={label}
           caption={caption}
-          ratio={ratio}
+          ratio={resolvedRatio}
           quiet={quietChrome}
           className="h-full w-full"
         />
@@ -161,15 +200,21 @@ export function CinematicVideo({
 
   return (
     <div
-      className={`relative overflow-hidden bg-ink-900 ${RATIOS[ratio]} ${className}`}
+      className={`relative overflow-hidden bg-ink-900 ${RATIOS[resolvedRatio]} ${className}`}
     >
       <video
         ref={videoRef}
         // `key` forces a reload when the breakpoint swaps the desktop/mobile file
         key={resolved}
-        className="absolute inset-0 h-full w-full object-cover"
+        /* Chrome lets a media element be picked up as a native drag, which in a
+           horizontal strip reads as "the video came loose". None of these
+           players are interactive — no controls, always muted — so the whole
+           element opts out of pointer input and the gesture falls through to
+           whatever is scrolling underneath it. */
+        draggable={false}
+        className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover [-webkit-user-drag:none]"
         src={resolved}
-        poster={poster}
+        poster={resolvedPoster}
         muted
         loop
         playsInline
@@ -195,6 +240,7 @@ export function FullscreenStoryVideo({
   src,
   srcMobile,
   poster,
+  image,
   label,
   caption,
   overlay = 0.45,
@@ -206,6 +252,7 @@ export function FullscreenStoryVideo({
         src={src}
         srcMobile={srcMobile}
         poster={poster}
+        image={image}
         label={label}
         caption={caption}
         ratio="fill"

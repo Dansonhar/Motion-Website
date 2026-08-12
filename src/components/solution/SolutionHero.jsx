@@ -37,6 +37,12 @@ export default function SolutionHero() {
           ratio="fill"
           src={`${BASE}video/solution/hero.mp4`}
           poster={`${BASE}video/solution/hero-poster.jpg`}
+          /* Separate portrait cut below 768px. The landscape master centre-
+             cropped into a 9:19 phone frame loses most of every shot; this is
+             the same montage reframed vertically. Only one of the two is ever
+             requested — see the note in CinematicVideo. */
+          srcMobile={`${BASE}video/solution/hero-mobile.mp4`}
+          posterMobile={`${BASE}video/solution/hero-mobile-poster.jpg`}
           label="Hero Film"
           caption="Service across five sectors — dining, fitness, retail, leisure, management"
           className="h-full w-full"

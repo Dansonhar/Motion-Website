@@ -17,7 +17,10 @@ const STAGES = [
   {
     n: '03',
     title: 'Design',
-    body: 'We design the right operational ecosystem around the business.',
+    /* Was "the right operational ecosystem" — the one piece of vendor-speak
+       left on the page, and the vaguest of the six bodies, which made the
+       central step of the engagement read as the emptiest. */
+    body: 'We design how the business should run — the flow of work, who does what, and the systems that carry it.',
   },
   {
     n: '04',
@@ -27,7 +30,8 @@ const STAGES = [
   {
     n: '05',
     title: 'Optimise',
-    body: 'We refine the operation using real business activity and management insight.',
+    // "real business activity" implied the five steps before it used fake data.
+    body: 'We refine the operation using how it actually trades once it is open.',
   },
   {
     n: '06',
@@ -61,7 +65,7 @@ export default function ApproachSection() {
         </div>
       </div>
 
-      <ol className="relative mt-20 sm:mt-28">
+      <ol className="relative mt-12 sm:mt-16">
         {/* the spine */}
         <div
           aria-hidden="true"

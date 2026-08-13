@@ -44,7 +44,10 @@ export default function SolutionHero() {
           srcMobile={`${BASE}video/solution/hero-mobile.mp4`}
           posterMobile={`${BASE}video/solution/hero-mobile-poster.jpg`}
           label="Hero Film"
-          caption="Service across five sectors — dining, fitness, retail, leisure, management"
+          /* Describes the montage for anyone who cannot see it. It previously
+             ended "...leisure, management" — management is not a sector, and
+             the fifth scene is a manager over the floor, not a fifth trade. */
+          caption="Dining, fitness, retail and leisure — and a manager over the floor"
           className="h-full w-full"
         />
       </motion.div>

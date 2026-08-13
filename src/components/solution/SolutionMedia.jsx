@@ -88,15 +88,22 @@ export function VideoPlaceholder({
   // would otherwise collide with the fixed nav and the story progress rail.
   quiet = false,
 }) {
+  /* `label={null}` renders the frame with no chrome at all. Anything printed
+     here is read by a visitor, so a placeholder that has no customer-facing
+     name to show must show nothing — never a production note ("supplied
+     later", a shot direction, a working title). Those belong in the code. */
+  const silent = !label
+
   return (
     <div
       className={`relative overflow-hidden glass rounded-2xl ${RATIOS[ratio]} ${className}`}
-      role="img"
-      aria-label={`${label}${caption ? ` — ${caption}` : ''} (video placeholder)`}
+      role={silent ? undefined : 'img'}
+      aria-hidden={silent || undefined}
+      aria-label={silent ? undefined : `${label}${caption ? ` — ${caption}` : ''}`}
     >
       {/* barely-there tonal wash so the block reads as a frame, not a hole */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_100%_at_30%_0%,rgba(176,141,87,0.10),transparent_60%)]" />
-      {quiet ? (
+      {silent ? null : quiet ? (
         <div className="absolute bottom-16 right-5 flex max-w-[min(22rem,60vw)] flex-col items-end gap-1.5 text-right sm:bottom-20 sm:right-8">
           <span className="text-[11px] font-semibold uppercase tracking-widest text-accent-400">
             {label}

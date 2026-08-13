@@ -52,7 +52,7 @@ export default function OutcomesSection() {
         </div>
       </div>
 
-      <div className="mt-20 grid grid-cols-1 border-t border-white/10 sm:mt-28 md:grid-cols-2">
+      <div className="mt-12 grid grid-cols-1 border-t border-white/10 sm:mt-16 md:grid-cols-2">
         {OUTCOMES.map((o, i) => (
           <Reveal
             key={o.n}

@@ -4,6 +4,10 @@ import Logo from './Logo.jsx'
 
 // Company/Resources are generic across every attraction; only "Solutions"
 // is product-specific, so it comes from each attraction's own `footer` field.
+//
+// An attraction can override "Resources" via `footer.resources` — the default
+// list is written for a product you install and support, which does not hold
+// for a vertical selling a consulting engagement.
 const SHARED_COLUMNS = [
   {
     heading: 'Company',
@@ -22,7 +26,11 @@ export default function Footer() {
     'A connected access system pairing self-service kiosks with secure, verified entry.'
   const columns = [
     { heading: 'Solutions', links: current.footer?.solutions ?? [] },
-    ...SHARED_COLUMNS,
+    ...SHARED_COLUMNS.map((c) =>
+      c.heading === 'Resources' && current.footer?.resources
+        ? { ...c, links: current.footer.resources }
+        : c,
+    ),
   ]
   return (
     <footer className="border-t border-white/8 bg-ink-950 px-5 py-16 sm:px-8">
@@ -63,10 +71,11 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/8 pt-8 text-sm text-white/60 sm:flex-row">
-          <p>
-            © 2026 {current.brandA}
-            {current.brandB}. All rights reserved.
-          </p>
+          {/* The company, not the vertical. `brandA`/`brandB` name the product
+              line for each attraction (GymAccess, ParkAccess, Solution), so
+              this line used to claim copyright for a company called "Solution"
+              directly under a logo that reads Q Studio. One owner, one name. */}
+          <p>© 2026 Q Studio. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#top" className="transition-colors hover:text-white/70">
               Privacy

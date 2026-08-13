@@ -75,28 +75,32 @@ const SYSTEMS = [
 
 export default function TechnologyLayer() {
   return (
-    <SectionShell label="The technology behind the operation" className="bg-ink-900">
+    <SectionShell label="Where the business sells" className="bg-ink-900">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-6">
           <Reveal>
-            <Eyebrow>Underneath</Eyebrow>
+            {/* This said "Underneath" / "The technology behind the operation" —
+                but every tile below is a surface the CUSTOMER touches, which is
+                in front of the operation, not behind it. Nothing underneath was
+                ever shown. The heading now describes what is actually here. */}
+            <Eyebrow>The technology</Eyebrow>
             <Display className="mt-7 max-w-[16ch]">
-              The technology behind the operation.
+              Every place the business sells.
             </Display>
           </Reveal>
         </div>
         <div className="lg:col-span-5 lg:col-start-8 lg:pt-6">
           <Reveal delay={0.12}>
             <Lede>
-              The right technology should disappear into the business, whatever
-              that business sells — connecting the customer experience, staff
-              operations and management without creating more complexity.
+              Counter, floor, self-service, table, phone and online — every one
+              of them running on the same system, so the business is not
+              operating a different one for each way a customer arrives.
             </Lede>
           </Reveal>
         </div>
       </div>
 
-      <div className="mt-20 grid grid-cols-1 gap-px border border-white/10 bg-white/10 sm:mt-28 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-12 grid grid-cols-1 gap-px border border-white/10 bg-white/10 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
         {SYSTEMS.map((system, i) => (
           <SystemSlot key={system.id} system={system} index={i} />
         ))}

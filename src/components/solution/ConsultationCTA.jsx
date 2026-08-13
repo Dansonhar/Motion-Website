@@ -14,11 +14,14 @@ export default function ConsultationCTA() {
       aria-label="Discuss your business"
       className="relative min-h-[92svh] w-full overflow-hidden border-t border-white/10"
     >
+      {/* No `label` — the frame stays silent until a film exists. It previously
+          printed "Closing Film / Wide, quiet, end of trade" over the closing
+          CTA: that is the shot direction for whoever films it, not something a
+          prospect should read. Drop a `src` in and the copy is unaffected. */}
       <CinematicVideo
         ratio="fill"
         overlay={0.62}
-        label="Closing Film"
-        caption="Wide, quiet, end of trade"
+        label={null}
         className="absolute inset-0 h-full w-full"
       />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950 via-transparent to-ink-950/60" />

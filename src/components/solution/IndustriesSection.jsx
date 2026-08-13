@@ -92,17 +92,21 @@ export default function IndustriesSection() {
         </div>
         <div className="lg:col-span-4 lg:col-start-9 lg:pt-6">
           <Reveal delay={0.12}>
+            {/* Present tense on purpose. This read "none of them were given the
+                same system" — a claim about past clients, made directly above
+                three case-study cards that are still empty. Say what is true of
+                the method, not what the page cannot yet show. */}
             <Lede>
               We work across customer-facing businesses, not one industry. None
-              of these operations run the same way, so none of them were given
-              the same system.
+              of these operations run the same way, so none of them get the same
+              system.
             </Lede>
           </Reveal>
         </div>
       </div>
 
       {/* The sector list — the breadth stated plainly, before any case study */}
-      <div className="mt-20 grid grid-cols-1 border-t border-white/10 sm:mt-28 md:grid-cols-2">
+      <div className="mt-12 grid grid-cols-1 border-t border-white/10 sm:mt-16 md:grid-cols-2">
         {SECTORS.map((s, i) => (
           <Reveal
             key={s.n}
@@ -123,20 +127,26 @@ export default function IndustriesSection() {
         ))}
       </div>
 
-      <div className="mt-24 sm:mt-32">
+      {/* Kept larger than the offsets above it — this is the seam between the
+          sector list and the case studies, the one real break inside the
+          section, so it has to out-space the gaps it separates. */}
+      <div className="mt-16 sm:mt-20">
         <Reveal>
           <Eyebrow>Experience</Eyebrow>
           <Display className="mt-7 max-w-[20ch]">Selected engagements.</Display>
         </Reveal>
       </div>
 
-      <div id="work" className="mt-16 grid grid-cols-1 gap-10 scroll-mt-28 sm:mt-20 md:grid-cols-3 md:gap-8">
+      <div id="work" className="mt-10 grid grid-cols-1 gap-10 scroll-mt-28 sm:mt-12 md:grid-cols-3 md:gap-8">
         {CASE_STUDIES.map((cs, i) => (
           <Reveal key={cs.id} delay={i * 0.1}>
             <article className="group">
+              {/* Silent frame. It used to caption itself "Concept film —
+                  supplied later", which told every visitor the section was
+                  unfinished; and the name it printed was repeated verbatim by
+                  the <h3> immediately below it. */}
               <CaseStudyVideo
-                label={cs.name}
-                caption="Concept film — supplied later"
+                label={null}
                 className="transition-opacity duration-700 group-hover:opacity-90"
               />
               <h3 className="mt-8 text-[clamp(1.35rem,2vw,1.9rem)] font-bold tracking-tight text-white">

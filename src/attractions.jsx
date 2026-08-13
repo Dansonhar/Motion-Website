@@ -52,12 +52,16 @@ export const ATTRACTIONS = [
     brandA: 'Solution',
     brandB: '',
     available: true,
+    // In page order, and each label names what the reader actually lands on.
+    // "About" pointed at #about — which is the problem statement, written about
+    // the CUSTOMER's business, not about us. Anyone clicking it expected to
+    // find out who Q Studio is and got a list of their own moving parts.
     links: [
-      { label: 'Approach', href: '#approach' },
+      { label: 'The Business', href: '#about' },
       { label: 'Solutions', href: '#solutions' },
+      { label: 'Approach', href: '#approach' },
       { label: 'Industries', href: '#industries' },
       { label: 'Work', href: '#work' },
-      { label: 'About', href: '#about' },
     ],
     // This vertical sells a consulting engagement, not a product trial — the
     // shared "Book a Demo" CTA would undercut the whole positioning.
@@ -72,6 +76,10 @@ export const ATTRACTIONS = [
         'Revenue & Retention',
         'Scale',
       ],
+      // The shared list (Documentation, Installation, FAQ) is written for a
+      // product you install. This vertical opens by saying it does not start
+      // with technology, so it names sections of the page instead.
+      resources: ['Our Approach', 'Industries We Work In', 'Selected Work'],
     },
   },
   {

@@ -172,7 +172,7 @@ export default function SolutionAreas() {
           triggering the browser's back-navigation gesture. */}
       <div
         ref={stripRef}
-        className="mt-14 -mx-6 flex touch-pan-x gap-5 overflow-x-auto overscroll-x-contain px-6 pb-4 sm:-mx-10 sm:mt-16 sm:px-10 lg:mx-0 lg:grid lg:grid-cols-5 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0"
+        className="mt-12 -mx-6 flex touch-pan-x gap-5 overflow-x-auto overscroll-x-contain px-6 pb-4 sm:-mx-10 sm:mt-16 sm:px-10 lg:mx-0 lg:grid lg:grid-cols-5 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0"
       >
         {AREAS.map((area, i) => (
           <Reveal

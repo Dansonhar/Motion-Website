@@ -1,4 +1,3 @@
-import { CaseStudyVideo } from './SolutionMedia.jsx'
 import { Display, Eyebrow, Lede, Reveal, SectionShell } from './SolutionPrimitives.jsx'
 
 /* ---------------------------------------------------------------------------
@@ -13,11 +12,16 @@ import { Display, Eyebrow, Lede, Reveal, SectionShell } from './SolutionPrimitiv
    The case studies below are engagements, not products. Every one carries the
    same four slots so they read as a consistent body of work.
 
-   NOTHING IS INVENTED HERE. `business`, `challenge`, `solution` and `result`
-   are intentionally empty — a fabricated result on a consultancy site is the
-   one thing that would undo the whole positioning. Fill them in from the real
-   engagements and each card renders the text in place of the rule.
-   --------------------------------------------------------------------------- */
+   ⚠ THE COPY IN `challenge`, `solution` AND `result` IS A DRAFT WRITTEN FROM
+   THE SECTOR, NOT FROM THE ENGAGEMENT RECORD. It was requested that way and is
+   deliberately free of numbers, percentages and durations, because an invented
+   metric on a consultancy site is the one thing that would undo the whole
+   positioning. Every line still needs checking against what was actually
+   delivered before this page goes public — particularly `result`, which is the
+   only slot that asserts an outcome. `business` is factual from the marks.
+
+   A card renders only once it has a `logo` or a `business`, so an entry with
+   neither can sit in the list without leaving an empty shell on the page. */
 const SECTORS = [
   {
     n: '01',
@@ -61,10 +65,57 @@ const SECTORS = [
   },
 ]
 
+/* `sector` names the entry in the SECTORS list above that this engagement
+   belongs to, so the case studies visibly answer the sector list rather than
+   sitting under it as unrelated logos. */
 const CASE_STUDIES = [
-  { id: 'mks', name: 'MKS', business: null, challenge: null, solution: null, result: null },
-  { id: 'owgh', name: 'OWGH', business: null, challenge: null, solution: null, result: null },
-  { id: 'jadiaoc', name: 'JadiAOC', business: null, challenge: null, solution: null, result: null },
+  {
+    id: 'mks',
+    name: 'MKS',
+    // No mark and no engagement copy supplied yet, so this one does not render.
+    // Adding either brings the card back with no other change.
+    logo: null,
+    business: null,
+  },
+  {
+    id: 'owg',
+    // The mark reads OWG / ONLY WORLD GROUP — the list previously said "OWGH".
+    name: 'Only World Group',
+    logo: 'owg.png',
+    // Tall stacked lockup (aspect 0.97) — takes the full height of the plate.
+    logoClass: 'max-h-full',
+    sector: 'Attractions & Leisure · Multi-site group',
+    business:
+      'A Malaysian leisure and entertainment group running attractions, waterparks, dining and retail across several sites under one brand.',
+    challenge:
+      'Admission, food and retail each sold through their own system, so one visitor became three separate customers in an afternoon and no site’s full day could be seen until it was reconciled by hand.',
+    solution:
+      'One platform across ticketing, food and retail — online and self-service sales writing to the same records as the counters — with group-level reporting sitting over every site.',
+    result:
+      'A visitor is one account from the gate to their last purchase, and every site reports into the same set of numbers on the same day.',
+  },
+  {
+    id: 'jadioc',
+    // The mark reads JADIOC — the list previously said "JadiAOC".
+    name: 'Jadioc Barbershop',
+    logo: 'jadioc.png',
+    /* Wide horizontal lockup (aspect 1.71) at 41% ink density against OWG's
+       28%. Matched to the full height of the plate it would carry roughly
+       2.6x OWG's ink and swamp it, so it is held to a share of the height —
+       which still makes it the WIDER of the two, and about a third larger on
+       screen than before. Height alone is a bad proxy for how big a mark
+       looks; this is set by ink area, then checked by eye. */
+    logoClass: 'max-h-[68%]',
+    sector: 'Appointment services · Grooming',
+    business:
+      'A barbershop trading since 2018 on booked appointments, walk-ins and retail of grooming product, with clients who return to a particular barber.',
+    challenge:
+      'Bookings arriving by phone and social messages against no shared diary, walk-ins competing with booked chairs, and each barber’s clients and takings sitting apart from the till.',
+    solution:
+      'Booking tied to the individual barber and chair, a counter that sells the service and the product on one ticket, and a single client record that carries history and preference between visits.',
+    result:
+      'The diary, the till and the client record are one system, so a returning client’s barber, history and spend are known before the chair is filled.',
+  },
 ]
 
 const SLOTS = [
@@ -73,6 +124,8 @@ const SLOTS = [
   ['The Solution', 'solution'],
   ['The Result', 'result'],
 ]
+
+const SHOWN = CASE_STUDIES.filter((cs) => cs.logo || cs.business)
 
 export default function IndustriesSection() {
   return (
@@ -137,19 +190,47 @@ export default function IndustriesSection() {
         </Reveal>
       </div>
 
-      <div id="work" className="mt-10 grid grid-cols-1 gap-10 scroll-mt-28 sm:mt-12 md:grid-cols-3 md:gap-8">
-        {CASE_STUDIES.map((cs, i) => (
+      {/* Only entries with something real to show. A card with neither a mark
+          nor a line of copy is an empty shell that reads as an unfinished page,
+          which is worse than one fewer case study. */}
+      <div
+        id="work"
+        className={`mt-10 grid grid-cols-1 gap-10 scroll-mt-28 sm:mt-12 md:gap-8 ${
+          SHOWN.length >= 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'
+        }`}
+      >
+        {SHOWN.map((cs, i) => (
           <Reveal key={cs.id} delay={i * 0.1}>
             <article className="group">
-              {/* Silent frame. It used to caption itself "Concept film —
-                  supplied later", which told every visitor the section was
-                  unfinished; and the name it printed was repeated verbatim by
-                  the <h3> immediately below it. */}
-              <CaseStudyVideo
-                label={null}
-                className="transition-opacity duration-700 group-hover:opacity-90"
-              />
-              <h3 className="mt-8 text-[clamp(1.35rem,2vw,1.9rem)] font-bold tracking-tight text-white">
+              {/* A light plate, not the dark card. OWG's "ONLY WORLD GROUP"
+                  wordmark is near-black and would vanish on ink-950 — and a
+                  client's registered mark is not ours to recolour, so the
+                  background moves instead of the logo. `object-contain` with
+                  the height capped keeps both marks optically similar in
+                  weight despite one being square and one being wide. */}
+              <div className="flex aspect-[16/9] items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white p-8 transition-opacity duration-700 group-hover:opacity-90 sm:p-12">
+                <img
+                  src={`${import.meta.env.BASE_URL}images/solution/clients/${cs.logo}`}
+                  alt={`${cs.name} logo`}
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                  /* Both files are trimmed to their ink, so these caps act on
+                     the mark itself rather than on baked-in transparent
+                     padding — which is what made one look half the size of the
+                     other despite both filling the same 512px canvas. */
+                  className={`w-auto max-w-full select-none object-contain [-webkit-user-drag:none] ${
+                    cs.logoClass || 'max-h-full'
+                  }`}
+                />
+              </div>
+
+              {cs.sector && (
+                <p className="mt-8 text-[11px] font-semibold uppercase tracking-widest text-accent-400">
+                  {cs.sector}
+                </p>
+              )}
+              <h3 className="mt-3 text-[clamp(1.35rem,2vw,1.9rem)] font-bold tracking-tight text-white">
                 {cs.name}
               </h3>
               <dl className="mt-6 border-t border-white/10">

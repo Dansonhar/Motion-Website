@@ -48,6 +48,21 @@ import { Display, Eyebrow, Lede, Reveal, SectionShell } from './SolutionPrimitiv
    The `image` field is optional and the row renders without it: an entry with no
    `image`, or one whose file has not landed yet, is simply the plain hairline
    row this list used to be. Nothing breaks, nothing shows a broken frame. */
+/* ── THE BRIGHTNESS DIAL ───────────────────────────────────────────────────
+   How bright a sector picture goes while the row is hovered or held under a
+   finger. 1 is the untouched frame; the rest state is the `opacity-25` utility
+   on the image itself, further down.
+
+   This single value feeds BOTH paths — it is set as a CSS variable that the
+   `group-hover:` utility reads, and used directly by the touch branch — so
+   raising it here brightens desktop and mobile together. Do not re-introduce a
+   literal in either place.
+
+   Above roughly 0.9 the copy starts to depend entirely on its text-shadow in
+   the brighter frames (04, 05, 07), so check those rows by eye after a change,
+   not just the dark ones. */
+const LIT = 0.92
+
 const SECTORS = [
   {
     n: '01',
@@ -263,10 +278,17 @@ export default function IndustriesSection() {
                   loading="lazy"
                   decoding="async"
                   draggable={false}
-                  /* Inline, not a conditional class. `opacity-30` and a lit
-                     `opacity-[0.62]` are both plain utilities, so which one won
+                  /* The lit value is published as a CSS variable and read back
+                     by the `group-hover:` utility below, so hover (CSS) and
+                     touch (the inline branch) cannot drift apart — LIT is the
+                     only place the number exists. It used to be written twice,
+                     which meant a phone and a laptop could brighten to two
+                     different levels from one edit.
+
+                     Touch has to be inline rather than a second class: `opacity-25`
+                     and a lit opacity are both plain utilities, so which one won
                      would depend on stylesheet order rather than on which is
-                     applied — inline style outranks both and settles it.
+                     applied. Inline outranks both and settles it.
 
                      Ramping IN faster than it fades out is deliberate. The
                      class below runs at 900ms, which is right for a mouse
@@ -276,15 +298,16 @@ export default function IndustriesSection() {
                      900ms path once these properties are dropped. */
                   style={{
                     objectPosition: `center ${s.focus || '50%'}`,
+                    '--sector-lit': LIT,
                     ...(heldIndex === i
                       ? {
-                          opacity: 0.62,
+                          opacity: LIT,
                           transitionDuration: '260ms',
                           ...(reduced ? null : { transform: 'scale(1.05)' }),
                         }
                       : null),
                   }}
-                  className="pointer-events-none absolute inset-0 -z-20 h-full w-full select-none object-cover opacity-30 transition-all duration-[900ms] ease-out [-webkit-user-drag:none] group-hover:scale-[1.05] group-hover:opacity-[0.62] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                  className="pointer-events-none absolute inset-0 -z-20 h-full w-full select-none object-cover opacity-25 transition-all duration-[900ms] ease-out [-webkit-user-drag:none] group-hover:scale-[1.05] group-hover:opacity-[var(--sector-lit)] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                 />
                 {/* Directional, not a flat wash — the same rule the problem
                     band follows. The copy column keeps a near-solid ground for
@@ -292,7 +315,7 @@ export default function IndustriesSection() {
                     is what leaves the picture readable as a picture. */}
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-ink-950 via-ink-950/80 to-ink-950/35"
+                  className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-ink-950 via-ink-950/80 to-ink-950/0"
                 />
               </>
             )}

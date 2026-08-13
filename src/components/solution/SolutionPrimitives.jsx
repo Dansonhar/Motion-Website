@@ -13,7 +13,7 @@ export const EASE = [0.16, 1, 0.3, 1]
 
 /* Cinematic reveal. Framer's MotionConfig reducedMotion="user" (set in App)
    strips the transform for users who ask for reduced motion, leaving the fade. */
-export function Reveal({ children, delay = 0, y = 28, className = '' }) {
+export function Reveal({ children, delay = 0, y = 28, className = '', ...rest }) {
   return (
     <motion.div
       initial={{ opacity: 0, y }}
@@ -21,6 +21,11 @@ export function Reveal({ children, delay = 0, y = 28, className = '' }) {
       viewport={{ once: true, margin: '-12% 0px' }}
       transition={{ duration: 1.1, delay, ease: EASE }}
       className={className}
+      /* Anything else — event handlers, aria, data-* — lands on the element
+         itself. The sector rows need pointer handlers on the same node that
+         carries `group`, and wrapping them in another div to get one would
+         change the layout the borders and padding are set on. */
+      {...rest}
     >
       {children}
     </motion.div>

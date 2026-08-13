@@ -13,7 +13,7 @@ import {
   UserCog,
   Users,
 } from 'lucide-react'
-import { Display, EASE, Eyebrow, Lede, Reveal } from './SolutionPrimitives.jsx'
+import { Display, EASE, Eyebrow, Reveal } from './SolutionPrimitives.jsx'
 
 /* The invisible complexity behind any serious operation, whatever the sector.
 
@@ -154,18 +154,6 @@ export default function ProblemSection() {
                 )
               })}
             </ul>
-          </div>
-
-          <div className="mt-12 grid grid-cols-1 gap-10 sm:mt-16 lg:grid-cols-12">
-            <div className="lg:col-span-6 lg:col-start-7">
-              <Reveal>
-                <p className="text-[clamp(1.35rem,2.3vw,2.15rem)] leading-[1.35] font-bold tracking-tight text-white">
-                  When these parts operate separately, complexity grows with the
-                  business.
-                </p>
-                <Lede className="mt-8">We bring them together.</Lede>
-              </Reveal>
-            </div>
           </div>
         </div>
       </div>

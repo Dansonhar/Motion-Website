@@ -2,7 +2,6 @@ import SolutionHero from '../components/solution/SolutionHero.jsx'
 import ProblemSection from '../components/solution/ProblemSection.jsx'
 import SolutionAreas from '../components/solution/SolutionAreas.jsx'
 import ApproachSection from '../components/solution/ApproachSection.jsx'
-import OutcomesSection from '../components/solution/OutcomesSection.jsx'
 import TechnologyLayer from '../components/solution/TechnologyLayer.jsx'
 import IndustriesSection from '../components/solution/IndustriesSection.jsx'
 import ConsultationCTA from '../components/solution/ConsultationCTA.jsx'
@@ -15,7 +14,7 @@ import ConsultationCTA from '../components/solution/ConsultationCTA.jsx'
    breadth is named explicitly in IndustriesSection rather than implied.
 
    The order of the page is the argument: the business first, the problem, what
-   we solve, how we work — and only then, seventh, the technology. Moving the
+   we solve, how we work — and only then, fifth, the technology. Moving the
    technology section higher would turn this back into a product site.
 
    Chrome (navbar, footer, Q Studio logo, palette and type) is the shared
@@ -34,7 +33,6 @@ export default function SolutionSite() {
         <ProblemSection />
         <SolutionAreas />
         <ApproachSection />
-        <OutcomesSection />
         <TechnologyLayer />
         <IndustriesSection />
         <ConsultationCTA />

@@ -172,7 +172,26 @@ export default function SolutionAreas() {
           triggering the browser's back-navigation gesture. */}
       <div
         ref={stripRef}
-        className="mt-12 -mx-6 flex touch-pan-x gap-5 overflow-x-auto overscroll-x-contain px-6 pb-4 sm:-mx-10 sm:mt-16 sm:px-10 lg:mx-0 lg:grid lg:grid-cols-5 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0"
+        /* `touch-auto`, NOT `touch-pan-x`. `pan-x` permits only horizontal
+           panning on this element: a vertical swipe that starts anywhere in
+           the strip — which is most of the screen on a phone — is neither
+           acted on nor passed up, so the page cannot be scrolled from here.
+           `auto` lets the browser resolve direction from the gesture itself:
+           drag sideways and the strip moves, drag down and the page moves.
+           It also leaves pinch-zoom intact, which `pan-x pan-y` would not.
+
+           `pb-8` IS LOAD-BEARING — it must stay >= Reveal's translate (28px).
+           `overflow-x: auto` forces `overflow-y` to compute to `auto`, so this
+           strip is a VERTICAL scroll container as well, whether or not that
+           was intended. Cards 3-5 start life at translateY(28px) and never
+           reveal until they are scrolled into view horizontally, so with the
+           old `pb-4` (16px) they poked 12px past the padding box — giving the
+           strip 12px of real vertical travel. Chrome then latched a downward
+           swipe to those 12px instead of passing it to the page, which made
+           the section impossible to scroll past by dragging on a film. Padding
+           the translate means scrollHeight === clientHeight and the gesture
+           chains straight through. */
+        className="mt-12 -mx-6 flex touch-auto gap-5 overflow-x-auto overscroll-x-contain px-6 pb-8 sm:-mx-10 sm:mt-16 sm:px-10 lg:mx-0 lg:grid lg:grid-cols-5 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0"
       >
         {AREAS.map((area, i) => (
           <Reveal
@@ -181,14 +200,30 @@ export default function SolutionAreas() {
             className="w-[74vw] max-w-[320px] shrink-0 lg:w-auto lg:max-w-none"
           >
             <article className="flex h-full flex-col">
-              {/* Vertical footage — a 9:16 frame so nothing is cropped. */}
+              {/* 4:5 while this is a scrolling strip, 9:16 once it becomes the
+                  five-column grid at `lg`.
+
+                  The footage is 720x1280, so 9:16 crops nothing — but on a
+                  phone a full 9:16 frame at this card width runs about 500px
+                  tall, which is most of the screen for one of five cards and
+                  pushes the heading and body off-screen. 4:5 takes a centre
+                  crop (~30% off the height); checked against a mid frame of
+                  all five films, none of them lose their subject.
+
+                  The ratio is switched with a responsive utility rather than
+                  the component's `ratioMobile` prop on purpose: this needs to
+                  change at `lg`, where the LAYOUT changes, and `ratioMobile`
+                  is driven by a 767px JS media query — which would have left
+                  tablets at 320x569. Two arbitrary `aspect-*` utilities are
+                  safe here because Tailwind emits responsive variants after
+                  base, so `lg:` wins regardless of class order. */}
               <CinematicVideo
-                ratio="tall"
+                ratio="portrait"
                 src={area.film ? `${BASE}video/solution/${area.film}.mp4` : undefined}
                 poster={area.film ? `${BASE}video/solution/${area.film}-poster.jpg` : undefined}
                 label={`Film ${area.n}`}
                 caption={area.caption}
-                className="w-full rounded-2xl border border-white/10"
+                className="w-full rounded-2xl border border-white/10 lg:aspect-[9/16]"
               />
 
               <div className="mt-7 flex items-baseline gap-4">

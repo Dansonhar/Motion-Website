@@ -82,6 +82,58 @@ export const ATTRACTIONS = [
       resources: ['Our Approach', 'Industries We Work In', 'Selected Work'],
     },
   },
+  /* QBot's own product line. Unlike Gym / Theme Park / Solution — which are
+     sector stories — these two are PRODUCT pages: what it is, what it does,
+     what it saves. Copy is drawn from qbot.now and qbot.now/qstudio and kept
+     to what those pages actually claim; nothing here is invented.
+
+     QBot is the company, QPOS and STUDIO are its products. Keep that hierarchy
+     in any copy added later — the live site is consistent about it
+     ("STUDIO by QBot", "STUDIO is part of the QBot product family"). */
+  {
+    id: 'qbot',
+    label: 'QBot',
+    brandA: 'QBot',
+    brandB: '',
+    available: true,
+    /* In page order. Each anchor lands on a scroll rig, so `scroll-padding-top`
+       in index.css is what keeps the pinned stage clear of the fixed navbar. */
+    links: [
+      { label: 'One Operation', href: '#operation' },
+      { label: 'The Device', href: '#device' },
+      { label: 'QHub', href: '#qhub' },
+      { label: 'What You Run', href: '#modules' },
+      { label: 'Hardware', href: '#hardware' },
+    ],
+    cta: { label: 'Book a Demo', href: '#demo' },
+    footer: {
+      blurb:
+        'Malaysia’s first 3-in-1 POS — counter, mobile and self-service kiosk in one device, with six sales channels feeding a single system.',
+      solutions: ['POS', 'mPOS', 'Kiosk', 'Tablet', 'QR Order', 'Webstore'],
+    },
+  },
+  {
+    id: 'qstudio',
+    label: 'QStudio',
+    brandA: 'STUDIO',
+    brandB: '',
+    available: true,
+    /* In page order. `#journey` and `#one` are pinned scroll rigs — anchoring
+       into one lands the visitor at its first step, which is the intent. */
+    links: [
+      { label: 'The Journey', href: '#journey' },
+      { label: 'One Operation', href: '#one' },
+      { label: 'Who It’s For', href: '#who' },
+      { label: 'At the Door', href: '#door' },
+      { label: 'Detail', href: '#more' },
+    ],
+    cta: { label: 'Book a Demo', href: '#demo' },
+    footer: {
+      blurb:
+        'The operating system for membership-based, walk-in businesses — memberships, bookings, check-in and payments from sign-up to renewal on one system.',
+      solutions: ['Memberships', 'Bookings', 'Face-ID Check-in', 'Rewards', 'Reports'],
+    },
+  },
   {
     id: 'mostar',
     label: 'Mostar City',

@@ -7,6 +7,8 @@ import ScrollProgress from './components/ScrollProgress.jsx'
 const GymSite = lazy(() => import('./sites/GymSite.jsx'))
 const ThemeParkSite = lazy(() => import('./sites/ThemeParkSite.jsx'))
 const SolutionSite = lazy(() => import('./sites/SolutionSite.jsx'))
+const QbotSite = lazy(() => import('./sites/QbotSite.jsx'))
+const QStudioSite = lazy(() => import('./sites/QStudioSite.jsx'))
 const MostarSite = lazy(() => import('./sites/MostarSite.jsx'))
 const Footer = lazy(() => import('./components/Footer.jsx'))
 
@@ -17,6 +19,10 @@ function Shell() {
   const site =
     current.id === 'solution' ? (
       <SolutionSite key="solution" />
+    ) : current.id === 'qbot' ? (
+      <QbotSite key="qbot" />
+    ) : current.id === 'qstudio' ? (
+      <QStudioSite key="qstudio" />
     ) : current.id === 'themepark' ? (
       <ThemeParkSite key="themepark" />
     ) : current.id === 'mostar' ? (

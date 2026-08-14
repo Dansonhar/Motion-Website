@@ -145,15 +145,20 @@ const SECTORS = [
    write-up is a separate piece of work, and the drafted copy is in git history
    if it is ever wanted for one.
 
-   `sector` deliberately reuses a name from the SECTORS list above, so the wall
-   reads as evidence for that list rather than as unrelated logos. Keep it to
-   two or three words — it sits on one line beside the name.
+   THE MARKS SIT DIRECTLY ON THE PAGE — no plate, no caption. Which means every
+   file here has to be legible on ink-950 (#060807) BY ITSELF. Check any new
+   logo before dropping it in: dark ink on this background is not "subtle", it
+   is gone. OWG is the worked example — its "ONLY WORLD GROUP" wordmark is pure
+   black, contrast 2.5:1 on this page, so `owg-dark.png` is a copy with that
+   one wordmark lifted to white and the red and grey untouched (the original
+   `owg.png` is kept beside it for any light-background use). Recolouring a
+   registered mark is a last resort; prefer a reversed version from the client
+   where one exists.
 
    `logoClass` optically sizes each mark. Marks differ wildly in shape and ink
-   density, so matching them by frame height alone makes the wide ones shout;
-   see the note on Jadioc. Files live in public/images/solution/clients/ and
-   should be trimmed to their ink so these caps act on the mark, not on
-   transparent padding.
+   density, so matching them by height alone makes the wide ones shout; see the
+   note on Jadioc. Files should be trimmed to their ink so these caps act on
+   the mark, not on transparent padding.
 
    An entry with no `logo` does not render, so a client can sit in this list
    waiting for its mark without leaving a hole in the wall. */
@@ -163,10 +168,9 @@ const CLIENTS = [
     id: 'owg',
     // The mark reads OWG / ONLY WORLD GROUP — the list previously said "OWGH".
     name: 'Only World Group',
-    logo: 'owg.png',
-    // Tall stacked lockup (aspect 0.97) — takes the full height of the plate.
+    logo: 'owg-dark.png',
+    // Tall stacked lockup (aspect 0.97) — takes the full height of the row.
     logoClass: 'max-h-full',
-    sector: 'Attractions & Leisure',
   },
   {
     id: 'jadioc',
@@ -174,12 +178,11 @@ const CLIENTS = [
     name: 'Jadioc Barbershop',
     logo: 'jadioc.png',
     /* Wide horizontal lockup (aspect 1.71) at 41% ink density against OWG's
-       28%. Matched to the full height of the plate it would carry roughly
-       2.6x OWG's ink and swamp it, so it is held to a share of the height —
-       which still makes it the WIDER of the two on screen. Height alone is a
-       bad proxy for how big a mark looks; set by ink area, checked by eye. */
+       28%. Matched to the full height it would carry roughly 2.6x OWG's ink
+       and swamp it, so it is held to a share of the height — which still makes
+       it the WIDER of the two on screen. Height alone is a bad proxy for how
+       big a mark looks; set by ink area, checked by eye. */
     logoClass: 'max-h-[68%]',
-    sector: 'Appointment Services',
   },
 ]
 
@@ -307,7 +310,7 @@ export default function IndustriesSection() {
                         }
                       : null),
                   }}
-                  className="pointer-events-none absolute inset-0 -z-20 h-full w-full select-none object-cover opacity-25 transition-all duration-[900ms] ease-out [-webkit-user-drag:none] group-hover:scale-[1.05] group-hover:opacity-[var(--sector-lit)] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                  className="pointer-events-none absolute inset-0 -z-20 h-full w-full select-none object-cover opacity-0 transition-all duration-[900ms] ease-out [-webkit-user-drag:none] group-hover:scale-[1.05] group-hover:opacity-[var(--sector-lit)] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                 />
                 {/* Directional, not a flat wash — the same rule the problem
                     band follows. The copy column keeps a near-solid ground for
@@ -361,47 +364,36 @@ export default function IndustriesSection() {
           a three-up on its own. */}
       <div
         id="work"
-        className={`mt-10 grid grid-cols-1 gap-6 scroll-mt-28 sm:mt-12 sm:grid-cols-2 sm:gap-8 ${
-          SHOWN.length >= 3 ? 'lg:grid-cols-3' : ''
-        }`}
+        /* Left-aligned, not centred. A centred logo wall is the convention, but
+           every headline, rule and list on this page hangs off the left gutter
+           — centring these two put them adrift in the middle of the section
+           with the headline pointing somewhere else. */
+        className="mt-12 flex flex-wrap items-center gap-x-16 gap-y-14 scroll-mt-28 sm:mt-16 sm:gap-x-28 lg:gap-x-40"
       >
         {SHOWN.map((client, i) => (
           <Reveal key={client.id} delay={i * 0.1}>
-            <figure className="group">
-              {/* A light plate, not the dark card. OWG's "ONLY WORLD GROUP"
-                  wordmark is near-black and would vanish on ink-950 — and a
-                  client's registered mark is not ours to recolour, so the
-                  background moves instead of the logo. */}
-              <div className="flex aspect-[16/9] items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white p-8 transition-transform duration-700 group-hover:-translate-y-1 sm:p-12">
-                <img
-                  src={`${import.meta.env.BASE_URL}images/solution/clients/${client.logo}`}
-                  alt={`${client.name} logo`}
-                  loading="lazy"
-                  decoding="async"
-                  draggable={false}
-                  /* Both files are trimmed to their ink, so these caps act on
-                     the mark itself rather than on baked-in transparent
-                     padding — which is what made one look half the size of the
-                     other despite both filling the same 512px canvas. */
-                  className={`w-auto max-w-full select-none object-contain [-webkit-user-drag:none] ${
-                    client.logoClass || 'max-h-full'
-                  }`}
-                />
-              </div>
+            {/* A fixed-height row rather than a fixed-width cell: marks vary
+                enormously in width and a grid column would leave the narrow
+                ones adrift in white space. Centred and wrapping, so the wall
+                stays balanced at any count without changing the column rule.
 
-              {/* One line under the mark: who, and what they trade in. Wraps to
-                  two lines on a phone, sits on one from `sm`. */}
-              <figcaption className="mt-5 flex flex-wrap items-baseline gap-x-4 gap-y-1 border-t border-white/10 pt-4">
-                <span className="text-base font-bold tracking-tight text-white sm:text-lg">
-                  {client.name}
-                </span>
-                {client.sector && (
-                  <span className="text-[11px] font-semibold uppercase tracking-widest text-white/45">
-                    {client.sector}
-                  </span>
-                )}
-              </figcaption>
-            </figure>
+                `max-h` is a share of THIS height — see `logoClass`. */}
+            <div className="flex h-28 items-center justify-center sm:h-36 lg:h-44">
+              <img
+                src={`${import.meta.env.BASE_URL}images/solution/clients/${client.logo}`}
+                alt={`${client.name} logo`}
+                loading="lazy"
+                decoding="async"
+                draggable={false}
+                /* Every file is trimmed to its ink, so these caps act on the
+                   mark itself rather than on baked-in transparent padding —
+                   which is what made one look half the size of the other
+                   despite both filling the same 512px canvas. */
+                className={`w-auto max-w-full select-none object-contain [-webkit-user-drag:none] ${
+                  client.logoClass || 'max-h-full'
+                }`}
+              />
+            </div>
           </Reveal>
         ))}
       </div>

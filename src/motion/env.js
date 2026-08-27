@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 /* ---------------------------------------------------------------------------
    Motion environment — one source of truth for the two questions every
-   scroll rig on the QBot and QStudio pages has to ask before it runs.
+   scroll rig on the QStudio page has to ask before it runs.
 
    These two hooks were previously redeclared in five separate files (Hero,
    ThemeParkHero, KioskShowcase, SwingBarrier, SolutionMedia), each with its own

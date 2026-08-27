@@ -4,7 +4,7 @@ import { EASE } from '../motion/StickyStage.jsx'
 /* ---------------------------------------------------------------------------
    Product UI atoms.
 
-   The QBot and QStudio pages show the product by BUILDING it, not by
+   The QStudio page shows the product by BUILDING it, not by
    photographing it. Every screen in ../product/screens.jsx is assembled from
    the pieces here — real DOM, so it animates, reflows and stays sharp at any
    density, and a state change is a transition rather than a cut between two
@@ -31,11 +31,10 @@ export const itemIn = {
 /* --------------------------------------------------------------------------
    Device — the frame the screens live in.
 
-   `kind` changes the physical form factor and IS animatable: the QBot 3-in-1
-   story morphs one device between counter, handheld and kiosk as the visitor
-   scrolls, which is the entire argument for that product made without a
-   sentence. The aspect ratio and corner radius animate; the screen inside
-   simply reflows.
+   `kind` changes the physical form factor and IS animatable: the journey rig
+   morphs one device between phone, kiosk, counter and desktop as the visitor
+   scrolls, which is how "one system" gets argued without a sentence. The aspect
+   ratio and corner radius animate; the screen inside simply reflows.
    -------------------------------------------------------------------------- */
 /* THE DEVICE IS SIZED BY HEIGHT, NOT WIDTH, and this is load-bearing.
 

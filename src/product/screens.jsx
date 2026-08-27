@@ -300,7 +300,7 @@ export function QHubScreen() {
 }
 
 /* --------------------------------------------------------------------------
-   The remaining QBot channels.
+   The remaining sales channels.
    -------------------------------------------------------------------------- */
 export function KioskScreen() {
   return (

@@ -66,7 +66,8 @@ export default function Navbar() {
               className="flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3 py-1.5 text-sm font-medium text-white/85 transition-colors hover:border-white/25 hover:bg-white/10"
             >
               <Layers size={15} className="text-accent-400" />
-              <span className="hidden sm:inline">Attractions:</span>
+              {/* Labels a demo switcher, not a destination — first to go. */}
+              <span className="hidden xl:inline">Attractions:</span>
               <span className="font-semibold">{current.label}</span>
               <ChevronDown
                 size={15}
@@ -116,12 +117,18 @@ export default function Navbar() {
           </div>
         </div>
 
-        <ul className="hidden items-center gap-8 lg:flex">
+        {/* Three fixes to one bug, and all three are needed:
+            `whitespace-nowrap` on the labels (a wrapped label made the row two
+            lines tall), `gap-6` until xl, and the desktop row now starting at xl
+            rather than lg. Between 1024 and 1280 the hamburger takes over, which
+            scales to any number of links — Solution was already wrapping at
+            1024px with five, before QStudio ever had six. */}
+        <ul className="hidden items-center gap-6 xl:flex xl:gap-8">
           {links.map((link) => (
             <li key={link.label}>
               <a
                 href={link.href}
-                className="text-sm font-medium text-white/70 transition-colors hover:text-white"
+                className="whitespace-nowrap text-sm font-medium text-white/70 transition-colors hover:text-white"
               >
                 {link.label}
               </a>
@@ -132,7 +139,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <a
             href={cta.href}
-            className="hidden rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-ink-950 [text-shadow:none] transition-colors hover:bg-accent-400 lg:inline-block"
+            className="hidden whitespace-nowrap rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-ink-950 [text-shadow:none] transition-colors hover:bg-accent-400 xl:inline-block"
           >
             {cta.label}
           </a>
@@ -141,7 +148,7 @@ export default function Navbar() {
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((open) => !open)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/10 lg:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/10 xl:hidden"
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -155,7 +162,7 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="overflow-hidden border-b border-white/5 bg-ink-950/95 backdrop-blur-xl lg:hidden"
+            className="overflow-hidden border-b border-white/5 bg-ink-950/95 backdrop-blur-xl xl:hidden"
           >
             <ul className="space-y-1 px-5 pb-6 pt-2">
               {links.map((link) => (

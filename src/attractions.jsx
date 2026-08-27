@@ -82,36 +82,20 @@ export const ATTRACTIONS = [
       resources: ['Our Approach', 'Industries We Work In', 'Selected Work'],
     },
   },
-  /* QBot's own product line. Unlike Gym / Theme Park / Solution — which are
-     sector stories — these two are PRODUCT pages: what it is, what it does,
-     what it saves. Copy is drawn from qbot.now and qbot.now/qstudio and kept
-     to what those pages actually claim; nothing here is invented.
+  /* STUDIO — QBot's platform for membership businesses, and the only product
+     page in this set. The rest are sector stories.
 
-     QBot is the company, QPOS and STUDIO are its products. Keep that hierarchy
-     in any copy added later — the live site is consistent about it
-     ("STUDIO by QBot", "STUDIO is part of the QBot product family"). */
-  {
-    id: 'qbot',
-    label: 'QBot',
-    brandA: 'QBot',
-    brandB: '',
-    available: true,
-    /* In page order. Each anchor lands on a scroll rig, so `scroll-padding-top`
-       in index.css is what keeps the pinned stage clear of the fixed navbar. */
-    links: [
-      { label: 'One Operation', href: '#operation' },
-      { label: 'The Device', href: '#device' },
-      { label: 'QHub', href: '#qhub' },
-      { label: 'What You Run', href: '#modules' },
-      { label: 'Hardware', href: '#hardware' },
-    ],
-    cta: { label: 'Book a Demo', href: '#demo' },
-    footer: {
-      blurb:
-        'Malaysia’s first 3-in-1 POS — counter, mobile and self-service kiosk in one device, with six sales channels feeding a single system.',
-      solutions: ['POS', 'mPOS', 'Kiosk', 'Tablet', 'QR Order', 'Webstore'],
-    },
-  },
+     POSITIONING, and every link below serves it: this page is written to be
+     read by an OPERATOR WITH A BUDGET — someone running outlets, carrying
+     payroll, answerable to a partner or a board. It is deliberately not written
+     to convert a single-owner shop hunting the cheapest monthly fee. That is
+     why the nav routes to what a real buyer evaluates (what it replaces, what
+     it costs, how it is configured, how the data is governed) rather than to a
+     feature tour, and why the CTA asks for a business review instead of a chat.
+
+     Copy is drawn from qbot.now/qstudio. Nothing here is invented — see the
+     header of QStudioSite.jsx, which holds the same rule and names the one
+     number that is still yours to set. */
   {
     id: 'qstudio',
     label: 'QStudio',
@@ -119,19 +103,32 @@ export const ATTRACTIONS = [
     brandB: '',
     available: true,
     /* In page order. `#journey` and `#one` are pinned scroll rigs — anchoring
-       into one lands the visitor at its first step, which is the intent. */
+       into one lands the visitor at its first step, which is the intent.
+
+       "Investment" is in the nav ON PURPOSE. A price shopper clicks it, reads
+       "billed annually, on application", and leaves without ever reaching the
+       form — which is the cheapest qualification this page can do. Hiding it
+       would only push that same visitor into the sales queue. */
     links: [
       { label: 'The Journey', href: '#journey' },
-      { label: 'One Operation', href: '#one' },
-      { label: 'Who It’s For', href: '#who' },
-      { label: 'At the Door', href: '#door' },
-      { label: 'Detail', href: '#more' },
+      { label: 'Seven Jobs', href: '#jobs' },
+      { label: 'What It Replaces', href: '#cost' },
+      { label: 'Custom Build', href: '#custom' },
+      { label: 'Compliance', href: '#governance' },
+      { label: 'Investment', href: '#investment' },
     ],
-    cta: { label: 'Book a Demo', href: '#demo' },
+    /* Not "Book a Demo". A demo is a product trial and costs the visitor
+       nothing to ask for; a business review implies preparation on both sides
+       and is the CTA a multi-outlet operator expects to see. */
+    cta: { label: 'Request a Business Review', href: '#review' },
     footer: {
       blurb:
         'The operating system for membership-based, walk-in businesses — memberships, bookings, check-in and payments from sign-up to renewal on one system.',
       solutions: ['Memberships', 'Bookings', 'Face-ID Check-in', 'Rewards', 'Reports'],
+      /* The shared list (Documentation, Installation, Case Studies, FAQ) is
+         written for a product you download. A multi-outlet buyer's procurement
+         asks these four questions instead. */
+      resources: ['Security & PDPA', 'Data Ownership', 'Deployment & Onboarding', 'Service Levels'],
     },
   },
   {

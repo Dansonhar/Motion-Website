@@ -1,8 +1,14 @@
 # Motion Site — Multi-Attraction Landing Pages
 
 A React + Vite motion site that presents several product "attractions" from one
-app, switchable from the top nav: **Gym**, **Kiosk Only**, **Theme Park**, and
-**Mostar City** (a standalone cinematic demo).
+app, switchable from the top nav: **Gym**, **Theme Park**, **Solution**,
+**QStudio**, and **Mostar City** (a standalone cinematic demo, hidden from the
+switcher).
+
+**QStudio** is the only product page in the set and the one written to sell. It
+is aimed at an operator with a budget rather than at the cheapest monthly fee —
+see the header of `src/sites/QStudioSite.jsx`, which explains the positioning and
+names the one commercial number (`PRICE_FROM`) still left to set.
 
 ## Stack
 - React 18 + Vite 6
@@ -36,7 +42,8 @@ public/                  Everything actually served to the browser
 src/
 ├── attractions.jsx       The list of attractions + which nav links/branding each uses
 ├── App.jsx                Picks which site to render based on the active attraction
-├── sites/                 One top-level page per attraction (GymSite, KioskSite, ThemeParkSite, MostarSite)
+├── sites/                 One top-level page per attraction (GymSite, ThemeParkSite,
+│                          SolutionSite, QStudioSite, MostarSite)
 └── components/            Section-level building blocks used by the sites above
 ```
 

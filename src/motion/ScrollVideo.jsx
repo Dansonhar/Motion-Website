@@ -5,7 +5,7 @@ import { EASE } from './StickyStage.jsx'
 import { usePrefersReducedMotion } from './env.js'
 
 /* ---------------------------------------------------------------------------
-   ScrollVideo — cinematic, scroll-driven film for the QBot and QStudio pages.
+   ScrollVideo — cinematic, scroll-driven film for the QStudio page.
 
    Replaces the click-to-play rule these pages used to hold. Footage now starts
    because the visitor scrolled to it, and the frame is staged so that arriving

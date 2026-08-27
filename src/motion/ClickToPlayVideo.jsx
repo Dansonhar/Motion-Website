@@ -4,9 +4,9 @@ import { Play } from 'lucide-react'
 import { EASE } from './StickyStage.jsx'
 
 /* ---------------------------------------------------------------------------
-   ClickToPlayVideo — the ONLY video primitive these two pages use.
+   ClickToPlayVideo — the ONLY video primitive the QStudio page uses.
 
-   Standing rule for QBot and QStudio: a video never starts because the visitor
+   Standing rule for QStudio: a video never starts because the visitor
    scrolled past it. It starts because they asked. So this ships with:
 
      preload="none"   nothing downloads until the poster is clicked

@@ -49,8 +49,8 @@ export default function Navbar() {
             'border-b border-transparent bg-transparent [text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_10px_rgba(0,0,0,0.6)]'
       }`}
     >
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:h-20 sm:px-8">
-        <div className="flex items-center gap-3 sm:gap-5">
+      <nav className="mx-auto flex h-16 max-w-[1500px] items-center justify-between gap-6 px-6 sm:h-20 sm:px-10">
+        <div className="flex shrink-0 items-center gap-3 sm:gap-5">
           {/* Logo */}
           <a href="#top" aria-label="Q Studio" className="flex items-center">
             <Logo />
@@ -67,7 +67,7 @@ export default function Navbar() {
             >
               <Layers size={15} className="text-accent-400" />
               {/* Labels a demo switcher, not a destination — first to go. */}
-              <span className="hidden xl:inline">Attractions:</span>
+              <span className="hidden 2xl:inline">Attractions:</span>
               <span className="font-semibold">{current.label}</span>
               <ChevronDown
                 size={15}
@@ -123,7 +123,7 @@ export default function Navbar() {
             rather than lg. Between 1024 and 1280 the hamburger takes over, which
             scales to any number of links — Solution was already wrapping at
             1024px with five, before QStudio ever had six. */}
-        <ul className="hidden items-center gap-6 xl:flex xl:gap-8">
+        <ul className="hidden min-w-0 items-center gap-5 xl:flex 2xl:gap-8">
           {links.map((link) => (
             <li key={link.label}>
               <a

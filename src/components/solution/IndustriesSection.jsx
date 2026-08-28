@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { usePrefersReducedMotion } from './SolutionMedia.jsx'
-import { Display, Eyebrow, Lede, Reveal, SectionShell } from './SolutionPrimitives.jsx'
+import { Display, EASE, Eyebrow, Lede, Reveal, SectionShell } from './SolutionPrimitives.jsx'
 
 /* ---------------------------------------------------------------------------
    Section 8 — the industries, then the clients.
@@ -49,18 +50,26 @@ import { Display, Eyebrow, Lede, Reveal, SectionShell } from './SolutionPrimitiv
    `image`, or one whose file has not landed yet, is simply the plain hairline
    row this list used to be. Nothing breaks, nothing shows a broken frame. */
 /* ── THE BRIGHTNESS DIAL ───────────────────────────────────────────────────
-   How bright a sector picture goes while the row is hovered or held under a
-   finger. 1 is the untouched frame; the rest state is the `opacity-25` utility
-   on the image itself, further down.
+   Two values, and the gap between them is the whole effect: `REST` is how the
+   picture sits when nobody is touching the row, `LIT` is where it goes when
+   somebody is. 1 is the untouched frame.
 
-   This single value feeds BOTH paths — it is set as a CSS variable that the
-   `group-hover:` utility reads, and used directly by the touch branch — so
-   raising it here brightens desktop and mobile together. Do not re-introduce a
-   literal in either place.
+   REST WAS 0 — the rows were plain text until hovered, which meant a phone
+   showed eight pictures that never appeared and a desktop showed one at a time.
+   The pictures now carry the list; the copy animates in over them on scroll.
 
-   Above roughly 0.9 the copy starts to depend entirely on its text-shadow in
-   the brighter frames (04, 05, 07), so check those rows by eye after a change,
-   not just the dark ones. */
+   0.55 is a legibility ceiling, not a taste call. The scrim below is
+   directional (near-solid down the copy column, clear on the far side), so the
+   number that matters is how much frame comes up UNDER the text. Past roughly
+   0.6 the body copy on the bright frames — 04 attractions, 05 hotels, 07
+   events — starts depending on its text-shadow alone. Raise it and check those
+   three by eye, not the dark ones.
+
+   LIT feeds BOTH interaction paths — set as a CSS variable the `group-hover:`
+   utility reads, and used directly by the touch branch — so changing it here
+   brightens desktop and mobile together. Do not re-introduce a literal in
+   either place. */
+const REST = 0.55
 const LIT = 0.92
 
 const SECTORS = [
@@ -250,9 +259,13 @@ export default function IndustriesSection() {
              `overflow-hidden` keeps the hover scale from bleeding across the
              hairlines. Note that `inset-0` resolves to the PADDING box, so the
              left border on odd rows is never covered by the image. */
-          <Reveal
+          /* NOT a `Reveal` any more. Reveal fades its whole subtree from
+             opacity 0, which would have taken the photograph up with the copy
+             — and the point of this row is that the picture is ALREADY THERE
+             when the words arrive over it. The two are animated separately
+             below, on the same trigger, a beat apart. */
+          <div
             key={s.n}
-            delay={(i % 2) * 0.08}
             className={`group relative isolate overflow-hidden border-b border-white/10 py-10 sm:py-12 ${
               i % 2 === 0 ? 'md:pr-16' : 'md:border-l md:pl-16'
             }`}
@@ -267,13 +280,29 @@ export default function IndustriesSection() {
           >
             {s.image && (
               <>
-                {/* Held well down at rest — eight lit photographs stacked in a
-                    list would out-shout the client wall below and turn the
-                    sector list into the loudest thing on the page. It is
-                    texture until the row is pointed at, then it is a picture.
-                    `alt=""` because the copy already names the sector; the
-                    frame is decorative and a screen reader announcing eight
-                    room descriptions would only get in the way. */}
+                {/* THE PICTURE LANDS FIRST. This layer carries the scroll
+                    entry — fade plus a slow settle out of a slight overscale,
+                    so the frame arrives as if a camera stopped moving — and the
+                    copy follows a beat later, over it.
+
+                    It has to be a SEPARATE element from the <img>. Framer
+                    writes its animated values as inline style, and the image's
+                    rest/hover brightness is a pair of Tailwind opacity
+                    utilities: animating opacity on the image itself would put
+                    an inline value on top of them and the hover would stop
+                    working entirely. Entry lives out here, brightness stays in
+                    there, and the two multiply.
+
+                    `once` because a row that re-enters every time it is
+                    scrolled past reads as a glitch rather than as craft. */}
+                <motion.div
+                  aria-hidden
+                  initial={reduced ? false : { opacity: 0, scale: 1.06 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true, margin: '-12% 0px' }}
+                  transition={{ duration: 1.3, ease: EASE }}
+                  className="pointer-events-none absolute inset-0 -z-20"
+                >
                 <img
                   src={`${import.meta.env.BASE_URL}images/solution/sectors/${s.image}`}
                   alt=""
@@ -288,10 +317,10 @@ export default function IndustriesSection() {
                      which meant a phone and a laptop could brighten to two
                      different levels from one edit.
 
-                     Touch has to be inline rather than a second class: `opacity-25`
-                     and a lit opacity are both plain utilities, so which one won
-                     would depend on stylesheet order rather than on which is
-                     applied. Inline outranks both and settles it.
+                     Touch has to be inline rather than a second class: the rest
+                     opacity and the lit opacity are both plain utilities, so
+                     which one won would depend on stylesheet order rather than
+                     on which is applied. Inline outranks both and settles it.
 
                      Ramping IN faster than it fades out is deliberate. The
                      class below runs at 900ms, which is right for a mouse
@@ -301,6 +330,7 @@ export default function IndustriesSection() {
                      900ms path once these properties are dropped. */
                   style={{
                     objectPosition: `center ${s.focus || '50%'}`,
+                    '--sector-rest': REST,
                     '--sector-lit': LIT,
                     ...(heldIndex === i
                       ? {
@@ -310,8 +340,16 @@ export default function IndustriesSection() {
                         }
                       : null),
                   }}
-                  className="pointer-events-none absolute inset-0 -z-20 h-full w-full select-none object-cover opacity-0 transition-all duration-[900ms] ease-out [-webkit-user-drag:none] group-hover:scale-[1.05] group-hover:opacity-[var(--sector-lit)] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                  /* `opacity-[var(--sector-rest)]` rather than a literal, for
+                     the same reason the lit value is a variable: REST is set
+                     once in JS and read by both the class here and the touch
+                     branch above, so a phone and a laptop cannot end up sitting
+                     at two different rest brightnesses.
+
+                     Positioning moved to the wrapper — this now just fills it. */
+                  className="pointer-events-none h-full w-full select-none object-cover opacity-[var(--sector-rest)] transition-all duration-[900ms] ease-out [-webkit-user-drag:none] group-hover:scale-[1.05] group-hover:opacity-[var(--sector-lit)] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                 />
+                </motion.div>
                 {/* Directional, not a flat wash — the same rule the problem
                     band follows. The copy column keeps a near-solid ground for
                     contrast while the far side of the frame stays open, which
@@ -323,7 +361,20 @@ export default function IndustriesSection() {
               </>
             )}
 
-            {/* Text-shadow as well as the scrim. At hover brightness a light
+            {/* THE WORDS ARRIVE SECOND, over a picture that is already there.
+
+                Three staggered parts rather than one block, because a rule, a
+                name and a sentence landing together is a card appearing —
+                landing in sequence is a caption being written. The delays are
+                measured from the picture's own entry (1.3s), not from zero:
+                0.3 puts the rule in while the frame is still settling, and the
+                sentence closes at 0.62 just as it comes to rest.
+
+                The whole group is offset by the row's parity so the two columns
+                of a desktop grid do not fire in lockstep — the same 0.08 the
+                old Reveal used.
+
+                Text-shadow as well as the scrim: at hover brightness a light
                 ceiling or a window in frame can still come up under the body
                 copy, and the gradient alone does not carry it. */}
             <div
@@ -333,19 +384,29 @@ export default function IndustriesSection() {
                   : undefined
               }
             >
-              <div className="flex items-baseline gap-6">
-                <span className="text-sm font-semibold tracking-widest text-accent-400">{s.n}</span>
-                <span className="h-px flex-1 bg-white/10" />
-              </div>
-              <h3 className="mt-6 text-[clamp(1.3rem,2vw,1.9rem)] leading-[1.15] font-bold tracking-tight text-white">
-                {s.name}
-              </h3>
-              {/* `text-white/85`, up from the Lede default of /75. Over a
-                  photograph the muted grey that reads as restraint on flat ink
-                  reads as washed out instead. */}
-              <Lede className={`mt-4 max-w-md ${s.image ? 'text-white/85' : ''}`}>{s.body}</Lede>
+              <Words delay={0.3 + (i % 2) * 0.08} reduced={reduced}>
+                <div className="flex items-baseline gap-6">
+                  <span className="text-sm font-semibold tracking-widest text-accent-400">
+                    {s.n}
+                  </span>
+                  <span className="h-px flex-1 bg-white/10" />
+                </div>
+              </Words>
+              <Words delay={0.46 + (i % 2) * 0.08} reduced={reduced}>
+                <h3 className="mt-6 text-[clamp(1.3rem,2vw,1.9rem)] leading-[1.15] font-bold tracking-tight text-white">
+                  {s.name}
+                </h3>
+              </Words>
+              <Words delay={0.62 + (i % 2) * 0.08} reduced={reduced}>
+                {/* `text-white/85`, up from the Lede default of /75. Over a
+                    photograph the muted grey that reads as restraint on flat
+                    ink reads as washed out instead. */}
+                <Lede className={`mt-4 max-w-md ${s.image ? 'text-white/85' : ''}`}>
+                  {s.body}
+                </Lede>
+              </Words>
             </div>
-          </Reveal>
+          </div>
         ))}
       </div>
 
@@ -398,5 +459,29 @@ export default function IndustriesSection() {
         ))}
       </div>
     </SectionShell>
+  )
+}
+
+/* One line of the caption, lifting in over the picture.
+
+   `margin: '-12% 0px'` matches the picture layer above it exactly. Both parts
+   of a row therefore trigger on the SAME scroll position and separate purely by
+   delay — if these two viewports drifted apart, a row entering slowly from the
+   bottom of a tall screen could fire its copy before its photograph.
+
+   Reduced motion gets the text immediately and unmoved. Someone who asked their
+   OS for less motion should not have to wait out a choreography to read a list;
+   `initial={false}` skips the animation entirely rather than shortening it. */
+function Words({ children, delay, reduced }) {
+  if (reduced) return children
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-12% 0px' }}
+      transition={{ duration: 0.85, delay, ease: EASE }}
+    >
+      {children}
+    </motion.div>
   )
 }

@@ -15,6 +15,56 @@
     Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+/* ============================================================
+   THE LIME THEME — STUDIO only.
+
+   Applied by App.jsx as `.theme-lime` on the app shell, driven by
+   `theme: 'lime'` on the attraction. It retints the whole surface —
+   navbar, page and footer together — by REDEFINING THE ACCENT TOKENS
+   rather than by editing components. Tailwind v4 compiles
+   `text-accent-400` to `color: var(--color-accent-400)`, so every accent
+   utility already in the tree resolves against whatever is in scope.
+   Nothing below this line needs a `theme-lime:` variant, and no component
+   hardcodes the colour.
+
+   #ccff00 on black is QBot's own pairing — lifted from their stylesheet,
+   not guessed (it is the single most-used colour in it). It is scoped to
+   the ONE page that sells their product. Every other vertical — Gym, Theme
+   Park, Solution, Salons — keeps the monochrome tokens, so the accent
+   marks the product rather than the company.
+
+   WHY IT IS SAFE TO PAINT EVERY ACCENT: in this codebase `accent-*` is
+   only ever worn by eyebrows, step numbers, small labels and primary
+   buttons. No paragraph, no headline and no body copy uses it — checked
+   across every Solution section, QStudioSite, Navbar and Footer. So the
+   accent lands on the things a luxury brand puts its colour on and stays
+   off the things it never does. Before adding `text-accent-*` to a block
+   of running text, re-read that sentence.
+
+   #ccff00 measures ~17:1 on ink-950 and is one of the brightest hues a
+   screen can make, so it must stay rationed. Used on a large area it
+   stops reading as expensive and starts reading as a highlighter pen.
+   ============================================================ */
+.theme-lime {
+  --color-accent-300: #a9d400; /* pressed / secondary — lime held back */
+  --color-accent-400: #ccff00; /* eyebrows, numbers, small labels */
+  --color-accent-500: #ccff00; /* primary button fill, on ink-950 text */
+  --color-accent-600: #b8e600; /* hover on the primary fill */
+}
+
+/* The section-opening hairline, retinted. `.sol-rule` is on every
+   SectionShell, which QStudioSite also uses, so this reaches its sections
+   without a single markup change — and, being scoped, leaves the identical
+   rules on the Solution page white. Held at 0.22: a 1px line at that alpha
+   reads as warmth in the black rather than as a coloured stripe. */
+.theme-lime .sol-rule {
+  background: linear-gradient(
+    90deg,
+    rgba(204, 255, 0, 0.22),
+    rgba(204, 255, 0, 0) 70%
+  );
+}
+
 html {
   scroll-behavior: smooth;
   /* Offset anchor jumps so they clear the fixed navbar */

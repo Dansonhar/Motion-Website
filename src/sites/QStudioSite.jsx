@@ -10,6 +10,7 @@ import {
   FileDown,
   Fingerprint,
   MapPin,
+  MessageCircle,
   Scissors,
   ScrollText,
   ShieldCheck,
@@ -352,16 +353,6 @@ const STANDING = [
    { name: 'Klang Valley fitness group', sector: 'Fitness', outlets: '14', ... }
    Do not populate this with estimates. */
 const CLIENTS = []
-
-/* The qualification form. Six fields, because six is where a serious buyer
-   still completes and a browser gives up — which is the intended split.
-
-   No backend on this site, so the answers compose a structured WhatsApp
-   message, the same channel the live site already uses. That is honest and it
-   means the sales team receives a qualified brief instead of "hi". */
-const OUTLET_BANDS = ['1 outlet', '2–5 outlets', '6–20 outlets', '20+ outlets']
-const MEMBER_BANDS = ['Under 300', '300–1,000', '1,000–5,000', '5,000+', 'Opening soon']
-const TIMELINES = ['Live this month', 'This quarter', 'This year', 'Scoping only']
 
 /* REAL QSTUDIO PHOTOGRAPHY. Pulled from qbot.now/qstudio (`/qfitimg/studioimg/`)
    and re-encoded for the web — 9.2MB of originals down to 1.9MB, source
@@ -2008,61 +1999,35 @@ function InvestmentSection() {
 }
 
 /* ---------------------------------------------------------------------------
-   The ask — a business review, behind six fields.
+   The ask — one tap into WhatsApp.
 
-   REPLACES THE OLD "Book a Demo" BUTTON, which was a single tap straight into
-   WhatsApp. That button converts everybody, which sounds good and is not: the
-   queue fills with visitors who have not decided anything, and the operator
-   with twelve outlets gets the same treatment as someone browsing.
+   REPLACES THE SIX-FIELD REVIEW FORM. The form asked a visitor to qualify
+   themselves before anyone had spoken to them, and with no backend on this
+   site every answer only ever became text in a WhatsApp draft anyway. The
+   qualifying questions belong in the conversation, where the team can ask the
+   two that actually matter for the operation in front of them.
 
-   Six fields is the deliberate split. It is trivial for a buyer who already
-   knows their outlet count and member base, and it is more than a browser will
-   type. WhatsApp is still on the page, demoted to "a quick question", so the
-   low-intent visitor is not blocked — just not counted as a lead.
-
-   NO BACKEND on this site, so the answers compose a structured WhatsApp
-   message — the channel the live site already uses. The team receives a
-   qualified brief instead of "hi", which is the actual win here.
+   So the section keeps the framing — a scheduled review, not an instant demo —
+   and drops the friction. One button, one channel, prefilled with an opener so
+   the thread does not start at "hi".
    --------------------------------------------------------------------------- */
 const WA_NUMBER = '60126909189'
 
-const SECTOR_OPTIONS = [...SECTORS.map((s) => s.name), 'Other']
+const WA_OPENER =
+  "Hi STUDIO — I'd like to book a 20-minute walk-through for my business."
+
+const WA_OPENER_BUSINESS =
+  'Hi STUDIO — here is what I run today and what I need it to do:'
+
+const wa = (text) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`
+const WA_LINK = wa(WA_OPENER)
+const WA_LINK_BUSINESS = wa(WA_OPENER_BUSINESS)
 
 function BusinessReview() {
-  const [form, setForm] = useState({
-    business: '',
-    sector: '',
-    outlets: '',
-    members: '',
-    timeline: '',
-    name: '',
-  })
-
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
-  const ready = Object.values(form).every((v) => v.trim() !== '')
-
-  const send = () => {
-    const lines = [
-      'STUDIO — business review request',
-      '',
-      `Business: ${form.business}`,
-      `Sector: ${form.sector}`,
-      `Outlets: ${form.outlets}`,
-      `Active members: ${form.members}`,
-      `Want to be live: ${form.timeline}`,
-      `Contact: ${form.name}`,
-    ]
-    window.open(
-      `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`,
-      '_blank',
-      'noopener,noreferrer',
-    )
-  }
-
   return (
     <section
       id="review"
-      aria-label="Request a business review"
+      aria-label="Talk to us on WhatsApp"
       className="relative isolate overflow-hidden border-t border-white/10 px-6 py-24 sm:px-10 sm:py-32"
     >
       <div
@@ -2070,147 +2035,68 @@ function BusinessReview() {
         className="pointer-events-none absolute inset-x-[-20%] -top-40 -z-10 h-[600px] rounded-[50%] border-t border-white/10 bg-[radial-gradient(60%_100%_at_50%_0%,rgba(255,255,255,0.06),transparent_70%)]"
       />
 
-      <div className="mx-auto grid w-full max-w-[1500px] grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-5">
+      <div className="mx-auto grid w-full max-w-[1500px] grid-cols-1 items-center gap-14 lg:grid-cols-12 lg:gap-16">
+        <div className="lg:col-span-6">
           <Reveal>
-            <Eyebrow>Request a business review</Eyebrow>
+            <Eyebrow>Talk to us</Eyebrow>
             <h2 className="mt-7 max-w-[15ch] text-[clamp(2.2rem,5vw,4.2rem)] leading-[1.02] font-bold tracking-tight text-white">
               See your own operation running on it.
             </h2>
-            <p className="mt-7 max-w-md text-[clamp(1rem,1.15vw,1.15rem)] leading-relaxed text-white/70">
-              We look at your outlets, what you run today and your member base, then come
-              back with a scope and a number. Reviews are scheduled, not instant.
+            <p className="mt-7 text-[clamp(1.05rem,1.3vw,1.25rem)] font-semibold italic leading-snug text-accent-400">
+              Tired of demos that show generic screens?
+            </p>
+            <p className="mt-5 max-w-md text-[clamp(1rem,1.15vw,1.15rem)] leading-relaxed text-white/70">
+              Book a 20-minute walk-through. We’ll show STUDIO configured to a
+              business like yours — sign-up flow, hardware fit, the works.
             </p>
             <p className="mt-8 text-[0.9rem] leading-relaxed text-white/45">
               Publika KL showroom · Mon–Fri, 10AM–7PM
-              <br />
-              Or{' '}
-              <a
-                href={`https://wa.me/${WA_NUMBER}`}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="font-semibold text-white/70 underline decoration-white/25 underline-offset-4 transition-colors hover:text-white"
-              >
-                ask a quick question on WhatsApp
-              </a>
-              .
             </p>
           </Reveal>
         </div>
 
-        <div className="lg:col-span-6 lg:col-start-7">
+        <div className="lg:col-span-5 lg:col-start-8">
           <Reveal delay={0.12}>
-            {/* Not a <form>: there is nothing to POST to, and a real submit
-                event would navigate away from the page. The button opens the
-                composed WhatsApp thread instead. */}
-            <div className="glass rounded-3xl p-7 sm:p-9">
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                <ReviewField label="Business name" className="sm:col-span-2">
-                  <input
-                    type="text"
-                    value={form.business}
-                    onChange={set('business')}
-                    placeholder="e.g. Studio Twelve"
-                    className={FIELD_CLASS}
-                  />
-                </ReviewField>
+            <div className="glass rounded-3xl p-8 sm:p-10">
+              <span className="inline-flex size-12 items-center justify-center rounded-2xl border border-white/12 bg-white/[0.04]">
+                <MessageCircle className="size-6 text-white" strokeWidth={1.8} aria-hidden />
+              </span>
 
-                <ReviewField label="Sector" className="sm:col-span-2">
-                  <ReviewSelect value={form.sector} onChange={set('sector')} options={SECTOR_OPTIONS} />
-                </ReviewField>
+              <p className="mt-6 text-[1.35rem] leading-snug font-bold tracking-tight text-white">
+                WhatsApp us now for more info.
+              </p>
+              <p className="mt-3 text-[0.95rem] leading-relaxed text-white/55">
+                Straight to the team — no forms, no callback queue. Replies during
+                showroom hours, usually the same day.
+              </p>
 
-                <ReviewField label="Outlets">
-                  <ReviewSelect value={form.outlets} onChange={set('outlets')} options={OUTLET_BANDS} />
-                </ReviewField>
-
-                <ReviewField label="Active members">
-                  <ReviewSelect value={form.members} onChange={set('members')} options={MEMBER_BANDS} />
-                </ReviewField>
-
-                <ReviewField label="Want to be live">
-                  <ReviewSelect value={form.timeline} onChange={set('timeline')} options={TIMELINES} />
-                </ReviewField>
-
-                <ReviewField label="Your name">
-                  <input
-                    type="text"
-                    value={form.name}
-                    onChange={set('name')}
-                    placeholder="Who we speak to"
-                    className={FIELD_CLASS}
-                  />
-                </ReviewField>
-              </div>
-
-              <button
-                type="button"
-                onClick={send}
-                disabled={!ready}
-                className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-[0.98rem] font-semibold transition-all ${
-                  ready
-                    ? 'bg-accent-500 text-ink-950 shadow-lg shadow-accent-500/20 hover:-translate-y-0.5'
-                    : 'cursor-not-allowed border border-white/10 bg-white/[0.03] text-white/30'
-                }`}
+              <a
+                href={WA_LINK}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent-500 px-6 py-4 text-[0.98rem] font-semibold text-ink-950 shadow-lg shadow-accent-500/20 transition-transform hover:-translate-y-0.5"
               >
-                Send for review
+                Book a demo
                 <ArrowRight className="size-4" strokeWidth={2.25} aria-hidden />
-              </button>
+              </a>
+
+              <a
+                href={WA_LINK_BUSINESS}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-4 text-[0.98rem] font-semibold text-white transition-colors hover:border-white/35 hover:bg-white/[0.04]"
+              >
+                Tell us about your business
+                <ArrowRight className="size-4" strokeWidth={2.25} aria-hidden />
+              </a>
 
               <p className="mt-5 text-center text-[0.8rem] text-white/35">
-                {ready
-                  ? 'Opens WhatsApp with your brief attached.'
-                  : 'All six fields, so the review is worth having.'}
+                Opens WhatsApp with a message ready to send.
               </p>
             </div>
           </Reveal>
         </div>
       </div>
     </section>
-  )
-}
-
-/* Shared field chrome. Kept as constants rather than components where it is
-   only a class string — one place to change the input treatment. */
-const FIELD_CLASS =
-  'w-full rounded-xl border border-white/12 bg-white/[0.04] px-4 py-3.5 text-[0.95rem] text-white outline-none transition-colors placeholder:text-white/30 focus:border-white/45'
-
-function ReviewField({ label, className = '', children }) {
-  return (
-    <label className={`block ${className}`}>
-      <span className="mb-2.5 block text-[11px] font-semibold uppercase tracking-widest text-white/45">
-        {label}
-      </span>
-      {children}
-    </label>
-  )
-}
-
-/* Native <select>, styled. A custom listbox would need its own keyboard and
-   focus handling for no gain — the native control is better on mobile and
-   already accessible. `bg-ink-900` is set so the option list is legible on the
-   platforms that inherit it. */
-function ReviewSelect({ value, onChange, options }) {
-  return (
-    <span className="relative block">
-      <select
-        value={value}
-        onChange={onChange}
-        className={`${FIELD_CLASS} appearance-none bg-ink-900 pr-11 ${
-          value ? 'text-white' : 'text-white/30'
-        }`}
-      >
-        <option value="">Select…</option>
-        {options.map((o) => (
-          <option key={o} value={o} className="text-white">
-            {o}
-          </option>
-        ))}
-      </select>
-      <ChevronDown
-        aria-hidden
-        className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-white/40"
-        strokeWidth={2}
-      />
-    </span>
   )
 }

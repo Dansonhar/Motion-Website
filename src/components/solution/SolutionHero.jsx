@@ -116,11 +116,16 @@ export default function SolutionHero() {
             >
               Discuss Your Business
             </a>
+            {/* Was "Explore Our Approach" -> #approach. That section is gone
+                and the anchor was dead, which on a smooth-scrolling page is a
+                button that silently does nothing. It now points at the industry
+                chooser, and the label asks the one question that section
+                answers. */}
             <a
-              href="#approach"
+              href="#choose"
               className="glass rounded-full px-8 py-4 text-center text-base font-semibold text-white transition-transform hover:-translate-y-0.5"
             >
-              Explore Our Approach
+              What Do You Run?
             </a>
           </motion.div>
         </div>

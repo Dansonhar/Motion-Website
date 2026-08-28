@@ -8,6 +8,7 @@ const GymSite = lazy(() => import('./sites/GymSite.jsx'))
 const ThemeParkSite = lazy(() => import('./sites/ThemeParkSite.jsx'))
 const SolutionSite = lazy(() => import('./sites/SolutionSite.jsx'))
 const QStudioSite = lazy(() => import('./sites/QStudioSite.jsx'))
+const SalonSite = lazy(() => import('./sites/SalonSite.jsx'))
 const MostarSite = lazy(() => import('./sites/MostarSite.jsx'))
 const Footer = lazy(() => import('./components/Footer.jsx'))
 
@@ -22,6 +23,8 @@ function Shell() {
       <QStudioSite key="qstudio" />
     ) : current.id === 'themepark' ? (
       <ThemeParkSite key="themepark" />
+    ) : current.id === 'salon' ? (
+      <SalonSite key="salon" />
     ) : current.id === 'mostar' ? (
       <MostarSite key="mostar" />
     ) : (
@@ -29,7 +32,16 @@ function Shell() {
     )
 
   return (
-    <div className="min-h-screen bg-ink-950 text-white">
+    /* `theme-lime` retints the accent tokens for this attraction — see the
+       block in index.css. It is applied HERE, on the shell, rather than inside
+       each site, because the navbar and footer are siblings of <main>: scoped
+       to the page they would leave a white CTA button in the bar above a lime
+       page. Attractions with no `theme` get the monochrome defaults. */
+    <div
+      className={`min-h-screen bg-ink-950 text-white${
+        current.theme === 'lime' ? ' theme-lime' : ''
+      }`}
+    >
       {/* Standalone attractions (their own header/footer) hide the shared chrome */}
       {!standalone && <ScrollProgress />}
       {!standalone && <Navbar />}

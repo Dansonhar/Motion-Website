@@ -70,10 +70,18 @@ export default function ProblemSection() {
           directional scrim under the copy column plus text-shadow on the type.
           The right half of the frame stays at full brightness. */}
       <div className="relative isolate flex min-h-[38svh] w-full items-center overflow-hidden py-16 sm:min-h-[48svh] sm:py-20">
+        {/* `lazy` because this band is the SECOND section — it is below the
+            fold on every viewport this site supports, and eager it was 193KB
+            competing with the hero video for the first paint. The lazy
+            threshold is generous (the browser starts it well before it scrolls
+            into view), so nothing arrives late. `async` decoding keeps the
+            decode off the main thread when it does land. */}
         <img
           src={`${import.meta.env.BASE_URL}images/solution/story-01-before-open.jpg`}
           alt="A room being set before it trades — staff prepping, counters ready, no customers yet"
           draggable={false}
+          loading="lazy"
+          decoding="async"
           className="pointer-events-none absolute inset-0 -z-10 h-full w-full select-none object-cover [-webkit-user-drag:none]"
         />
         <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-ink-950/95 via-ink-950/45 to-transparent" />

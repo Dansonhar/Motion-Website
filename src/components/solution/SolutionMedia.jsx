@@ -38,21 +38,36 @@ export function useIsMobile(query = '(max-width: 767px)') {
 /* Videos ship with preload="none" and no autoplay attribute, then start loading
    only once they are within a screen of the viewport. `autoplay` in the markup
    would override preload="none" and pull every clip on first paint, so playback
-   is started here instead. */
+   is started here instead.
+
+   THEY ALSO STOP AGAIN, and that is not a detail. The Solution page carries
+   twelve of these. This observer used to start a clip and never look at it
+   again, so by the time a visitor reached the bottom of the page all twelve
+   were still decoding — off screen, on loop, for as long as the tab stayed
+   open. On a laptop that is fan noise; on a phone it is battery. Pausing on
+   exit costs nothing to resume, because the file is already buffered.
+
+   `rootMargin: '100%'` gives this its hysteresis for free: a clip starts a full
+   screen before it arrives and is not paused until a full screen after it
+   leaves, so a visitor scrolling normally never sits on the boundary
+   stop-starting one. */
 function useLazyAutoplay(active) {
   const ref = useRef(null)
   useEffect(() => {
     const v = ref.current
     if (!v || !active) return
     const start = () => {
-      if (v.preload !== 'auto') {
-        v.preload = 'auto'
-        v.load()
-      }
+      /* Raising `preload` is enough to begin the fetch on its own, and `play()`
+         forces it regardless. Calling `load()` as well used to cost a wasted
+         round trip per clip — it RESETS the element and aborts the request that
+         raising `preload` just started, which shows in the network trace as
+         206 -> ERR_ABORTED -> 304 for a single file. Twelve of those on this
+         page. */
+      if (v.preload !== 'auto') v.preload = 'auto'
       v.play().catch(() => {})
     }
     const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && start()),
+      (entries) => entries.forEach((e) => (e.isIntersecting ? start() : v.pause())),
       { rootMargin: '100% 0px' },
     )
     io.observe(v)

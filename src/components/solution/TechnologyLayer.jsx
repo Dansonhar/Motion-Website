@@ -1,7 +1,4 @@
-import { useRef } from 'react'
-import { useInView } from 'framer-motion'
 import { CinematicVideo } from './SolutionMedia.jsx'
-import { ProductScreen } from '../../product/screens.jsx'
 import { Display, Eyebrow, Lede, Reveal, SectionShell } from './SolutionPrimitives.jsx'
 
 /* ---------------------------------------------------------------------------
@@ -45,19 +42,18 @@ import { Display, Eyebrow, Lede, Reveal, SectionShell } from './SolutionPrimitiv
    itself. A cell with an image drops its `body`: the picture is the
    description, and printing both would say the same thing twice.
 
-   TWO KINDS OF CELL, AND THE SPLIT IS THE ARGUMENT. Cells 01-06 are the places
-   a customer transacts, and they are film of the actual device. Cells 07-09 are
-   what the system holds about that customer — identity, reservation,
-   entitlement — and those have no object to photograph, so they show the
-   interface itself, live, via `screen`.
+   ALL NINE ARE FILM. Cells 01-06 are the places a customer transacts; 07-09
+   are what the system holds about that customer — identity, reservation,
+   entitlement.
 
-   That is not a compromise for missing footage. Shooting a "membership" would
-   mean shooting a person, which says nothing about the system; the wallet
-   screen says all of it. The three are rendered from product/screens.jsx —
-   the same components QStudio uses — so they cannot drift from the product.
-
-   Payments and Backoffice & Analytics are still missing and are the obvious
-   candidates for 10 and 11 (see the grid note above before adding either).
+   07-09 shipped first as LIVE INTERFACES rendered from product/screens.jsx,
+   through a `screen` field on the entry, because there was no footage for them
+   yet. The footage landed and they were swapped to film. That `screen` path
+   has been REMOVED rather than left in: it cost this page the whole 18kB
+   screens chunk on every visit for a branch no entry used any more. It is one
+   revert away in git if a future cell has no object to photograph — Payments
+   and Backoffice & Analytics, the obvious 10 and 11, are exactly that kind of
+   thing (read the grid note above before adding either).
    --------------------------------------------------------------------------- */
 /* Ordered by how much staff involvement the sale takes: fully staffed at the
    counter, then staff on the floor, then the customer serving themselves, then
@@ -92,14 +88,23 @@ const SYSTEMS = [
   /* 07-09. `screen` addresses a component in product/screens.jsx and takes the
      place of `video`/`image` — see the note on the two kinds of cell above.
      Each one is the real interface, not a picture of a device running it. */
-  /* `fade` marks a screen whose list is LONGER than a landscape tile can show,
-     so the bottom edge gets a scrim and the last row reads as continuing
-     rather than as cropped. Face ID is not one of them: it ends in a complete
-     status bar that has to stay legible, and a scrim over it just looked like
-     the cell was dimming for no reason. */
-  { id: 'access', name: 'Access & Face ID', screen: 'faceid' },
-  { id: 'booking', name: 'Booking', screen: 'booking', fade: true },
-  { id: 'membership', name: 'Membership', screen: 'member', fade: true },
+  /* `membership.mp4` is the one to know about: its source is PORTRAIT
+     (720x1280) where every other clip here is landscape, so filling this tile
+     costs 61% of its height. The band was chosen by eye at y=390 — the only
+     offset that keeps faces off the top edge AND the member-profile screen in
+     the last shot, which is the frame that actually says "membership". Re-cut
+     it and that offset has to be re-judged, not carried over.
+
+     Its source also carried an AAC track, stripped on encode: these tiles
+     autoplay muted and none of the other eight has audio. */
+  { id: 'access', name: 'Access & Face ID', video: 'access.mp4', image: 'access-poster.jpg' },
+  { id: 'booking', name: 'Booking', video: 'booking.mp4', image: 'booking-poster.jpg' },
+  {
+    id: 'membership',
+    name: 'Membership',
+    video: 'membership.mp4',
+    image: 'membership-poster.jpg',
+  },
 ]
 
 export default function TechnologyLayer() {
@@ -159,22 +164,7 @@ function SystemSlot({ system, index }) {
   const base = import.meta.env.BASE_URL
   const image = system.image ? `${base}images/solution/tech/${system.image}` : null
   const video = system.video ? `${base}video/solution/tech/${system.video}` : null
-  const media = video || image || system.screen
-
-  /* The interface cells are MOUNTED ON ENTRY, not on page load, and that is the
-     whole point of this ref.
-
-     Every screen animates itself on mount — the face scan sweeps once and lands
-     on "Matched", the booking and wallet rows stagger in. Rendered with the
-     rest of the page those animations run while the section is a thousand
-     pixels below the fold, and a visitor scrolling down arrives at three
-     finished, static screens having seen none of it.
-
-     `once: true` so they play through exactly once and then hold, which matches
-     the films beside them: those start on viewport entry too and are not
-     restarted every time the row passes. */
-  const slotRef = useRef(null)
-  const inView = useInView(slotRef, { once: true, margin: '0px 0px -10% 0px' })
+  const media = video || image
 
   return (
     /* The opaque cell is this outer div, NOT the animated one. The grid is
@@ -182,7 +172,7 @@ function SystemSlot({ system, index }) {
        lets that light background show through — and Reveal holds a cell at
        zero until it scrolls into view. Animating the grid item itself turned
        every not-yet-revealed row into a grey block. Only the contents fade. */
-    <div ref={slotRef} className="bg-ink-950">
+    <div className="bg-ink-950">
       <Reveal delay={(index % 3) * 0.07}>
         <div className="group flex min-h-[220px] flex-col justify-between gap-8 p-8 transition-colors duration-500 hover:bg-ink-900 sm:min-h-[260px] sm:p-10">
         <span className="text-sm font-semibold tracking-widest text-accent-400">
@@ -191,26 +181,7 @@ function SystemSlot({ system, index }) {
 
         {filled ? (
           <div>
-            {system.screen ? (
-              /* The interface itself, in the same frame the films use, so the
-                 nine cells stay one table rather than two. No `Device` chrome
-                 around it on purpose: a bezel here would be a SECOND device
-                 drawn beside six photographs of real ones, and the drawn one
-                 always loses. The screen runs edge to edge instead and reads
-                 as what it is — a picture of the software, not of a gadget. */
-              <div className="relative mb-7 aspect-[683/472] w-full overflow-hidden rounded-lg border border-white/10 bg-ink-900">
-                {inView && <ProductScreen name={system.screen} />}
-                {/* See `fade` in SYSTEMS — only the screens that actually run
-                    past the frame get this. `pointer-events-none` so it never
-                    sits between the screen and a cursor. */}
-                {system.fade && (
-                  <span
-                    aria-hidden
-                    className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-ink-900 to-transparent"
-                  />
-                )}
-              </div>
-            ) : video ? (
+            {video ? (
               /* CinematicVideo rather than a bare <video>: it brings the lazy
                  start (nothing downloads until the tile is near the viewport),
                  the poster, and the drag-lock the rest of the page uses. */

@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { EASE } from '../motion/StickyStage.jsx'
 
@@ -53,27 +54,68 @@ const FORMS = {
   kiosk: { h: 1, ratio: 10 / 16, radius: 14, stand: true },
   desktop: { h: 0.82, ratio: 16 / 10, radius: 12, stand: true },
   phone: { h: 0.96, ratio: 9 / 19.5, radius: 30, stand: false },
+  /* A wide external monitor. Added for the journey's last step, whose
+     dashboard screenshot is 2:1 — in the 16:10 `desktop` frame a fifth of it
+     was being cropped away, and the parts that go first are the outermost
+     ones: the nav rail on the left and the far-right stat card. */
+  monitor: { h: 0.7, ratio: 2, radius: 12, stand: true },
 }
 
 export function Device({ kind = 'desktop', children, className = '' }) {
   const form = FORMS[kind] || FORMS.desktop
+
+  /* THE FRAME IS FITTED TO BOTH AXES, IN PIXELS, AND IT HAS TO BE.
+
+     This used to animate `height: <share>%` with `aspectRatio` and lean on a
+     `max-w-full` class to handle the rest. It does not: `height` is a definite
+     value, so when `max-width` clamped the width the browser kept the height
+     and the ratio simply broke. The wide forms were the casualty — measured on
+     a 2560x1440 display the 16:10 desktop frame rendered at 664x742, which is
+     0.90. A landscape monitor was drawing as a portrait one, and any image
+     inside it lost nearly half its width to the crop.
+
+     So the fit is computed here instead: take the share of the box height this
+     form asks for, derive the width from the ratio, and if that overflows the
+     box, re-solve from the width. Exactly the "contain" rule, and it holds at
+     every viewport.
+
+     `useLayoutEffect` rather than `useEffect` — it measures and re-renders
+     before the browser paints, so the frame is never briefly 0x0. */
+  const boxRef = useRef(null)
+  const [box, setBox] = useState(null)
+  useLayoutEffect(() => {
+    const el = boxRef.current
+    if (!el) return
+    const read = () => setBox({ w: el.clientWidth, h: el.clientHeight })
+    read()
+    const ro = new ResizeObserver(read)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  let h = box ? box.h * form.h : 0
+  let w = h * form.ratio
+  if (box && w > box.w) {
+    w = box.w
+    h = w / form.ratio
+  }
+
   return (
     /* The stage box. Give this a height (it defaults to filling its parent) and
        every form factor stays inside it. */
-    <div className={`flex h-full w-full items-center justify-center ${className}`}>
+    <div
+      ref={boxRef}
+      className={`flex h-full w-full items-center justify-center ${className}`}
+    >
       {/* `initial={false}` so the first paint lands on the correct form factor
-          instead of animating into it — and so height/aspectRatio are not
-          declared twice (once in `style`, once in `animate`), which is how the
-          two ended up fighting over which one the DOM actually got. */}
+          instead of animating into it. Width and height are both animated now,
+          which is what makes the morph between form factors read as one object
+          changing shape rather than two boxes swapping. */}
       <motion.div
         initial={false}
-        animate={{
-          height: `${form.h * 100}%`,
-          aspectRatio: form.ratio,
-          borderRadius: form.radius,
-        }}
+        animate={{ width: w, height: h, borderRadius: form.radius }}
         transition={{ duration: 0.75, ease: EASE }}
-        className="relative flex max-w-full border border-white/12 bg-ink-950 p-[6px] shadow-[0_40px_120px_-30px_rgba(0,0,0,0.9)]"
+        className="relative flex border border-white/12 bg-ink-950 p-[6px] shadow-[0_40px_120px_-30px_rgba(0,0,0,0.9)]"
       >
         {/* The bezel highlight — one hairline gradient, no image. */}
         <span

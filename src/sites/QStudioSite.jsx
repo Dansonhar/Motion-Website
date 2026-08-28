@@ -20,6 +20,7 @@ import { EASE, ScrollCue, StepRail, StickyStage, Swap } from '../motion/StickySt
 import { useSimpleMotion } from '../motion/env.js'
 import { Device } from '../product/atoms.jsx'
 import { ProductScreen } from '../product/screens.jsx'
+import { CinematicVideo } from '../components/solution/SolutionMedia.jsx'
 import { Display, Eyebrow, Reveal, SectionShell } from '../components/solution/SolutionPrimitives.jsx'
 
 /* ---------------------------------------------------------------------------
@@ -63,9 +64,13 @@ import { Display, Eyebrow, Reveal, SectionShell } from '../components/solution/S
    published floor is the single strongest filter on this page. Set it.
 
    RULES THIS PAGE HOLDS TO
-   - No video autoplays. There is no video on this page yet; when footage
-     arrives it goes in ClickToPlayVideo, never CinematicVideo (which
-     autostarts on viewport entry — see the note in that file).
+   - Video on this page. The hero and the custom-build before/after clips both
+     autostart on viewport entry via CinematicVideo, and both PAUSE again on
+     exit. The old rule here said the opposite — that nothing may autoplay and
+     footage must go in ClickToPlayVideo. That was written when the page had no
+     film at all and no primitive that stopped when it left the screen; the one
+     it named has since been retired. Silent, looping, self-pausing chrome is
+     not the thing that rule was protecting against.
    - Every claim still comes from qbot.now/qstudio. Nothing was invented to fill
      a shorter format, and no metric appears that the source does not publish.
      The one numeric comparison they do make — 30 seconds against 1 second at
@@ -89,6 +94,51 @@ import { Display, Eyebrow, Reveal, SectionShell } from '../components/solution/S
    in product/screens.jsx; `device` picks the form factor it is shown on. The
    two together are the argument — the same system, met on a phone, at a gate,
    at the counter, and finally from the back office. */
+/* `image` is a real screenshot of the product, in public/images/qstudio/journey/,
+   and it WINS over `screen`. `screen` is the drawn interface from
+   product/screens.jsx and is now the fallback: a step keeps rendering its built
+   UI until a photograph of the real thing exists, so the rig never has a hole
+   in it. Step 04 is the one still on the fallback.
+
+   THE DEVICE HAS TO MATCH THE FILE, not the other way round. Every image here
+   is `object-cover` inside its frame, so a shape mismatch is not a letterbox —
+   it is a silent crop of the outermost content, which is exactly where a nav
+   rail or a total lives. Two of these were re-homed for that reason and both
+   are noted below. Check a new file's aspect before adding it. */
+/* One journey step's visual: the real screenshot where there is one, the drawn
+   interface where there is not.
+
+   `Swap` is keyed on the step so a change cross-fades either way — and the key
+   includes which KIND of visual it is, so moving a step from the drawn screen
+   to a photograph animates rather than cutting.
+
+   `object-cover` with `object-top`: these are full-page captures, taller than
+   the frame. Anchoring to the top keeps the header, the title and the first
+   rows — the part that identifies the screen — and lets the crop fall off the
+   bottom, which is where the whitespace is. Centred, every one of them lost
+   its heading. */
+function StepVisual({ step }) {
+  const src = step.image
+    ? `${import.meta.env.BASE_URL}images/qstudio/journey/${step.image}`
+    : null
+  return (
+    <Swap id={`${step.id}-${src ? 'img' : 'ui'}`} y={10} duration={0.42} className="h-full">
+      {src ? (
+        <img
+          src={src}
+          alt={step.title}
+          draggable={false}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full select-none object-cover object-top [-webkit-user-drag:none]"
+        />
+      ) : (
+        <ProductScreen name={step.screen} />
+      )}
+    </Swap>
+  )
+}
+
 const JOURNEY = [
   {
     id: 'discover',
@@ -96,6 +146,7 @@ const JOURNEY = [
     title: 'They find you',
     line: 'Plans and classes, bookable from your own site.',
     screen: 'webstore',
+    image: '01-discover.png',
     device: 'phone',
   },
   {
@@ -104,6 +155,7 @@ const JOURNEY = [
     title: 'A slot is held',
     line: 'One calendar. One capacity. One waitlist.',
     screen: 'booking',
+    image: '02-book.png',
     device: 'phone',
   },
   {
@@ -112,23 +164,45 @@ const JOURNEY = [
     title: 'Membership starts',
     line: 'Recurring or one-time, on Malaysia’s payment rails.',
     screen: 'checkout',
+    image: '03-pay.png',
     device: 'phone',
   },
   {
+    /* The only .jpg in this set, and the only one that should be. The other six
+       are UI screenshots — flat colour and crisp text, which is what PNG is
+       for. This one is a photograph of a room behind a face-framing overlay,
+       and as a PNG it shipped at 1.85MB. At JPEG q90 with 4:4:4 chroma (the
+       subsampling matters: the frame's thin white brackets fringe badly at
+       4:2:0) it is 280KB for an SSIM of 0.990.
+
+       It is also the only DARK screen in the seven, which is correct rather
+       than inconsistent — a gate reader in a dim entrance is not a white web
+       page. It arrived at 992x1586, which is 10:16 to the pixel, so the kiosk
+       frame crops nothing at all. */
     id: 'arrive',
     n: '04',
     title: 'The face is the membership',
     line: 'No card. No QR. No front desk.',
     screen: 'faceid',
+    image: '04-arrive.jpg',
     device: 'kiosk',
   },
   {
+    /* WAS `device: 'counter'`, a 16:10 landscape till. The supplied file is a
+       9:19.5 phone screenshot, and in the counter frame it would have been
+       cropped to a narrow vertical strip of itself. The frame follows the
+       file.
+
+       Worth knowing: the picture is a member buying a package in the webstore,
+       so `line` below — written for a staffed till — is describing something
+       the image does not show. Flagged rather than quietly rewritten. */
     id: 'inside',
     n: '05',
     title: 'Spend goes on the member',
     line: 'The counter already knows who they are.',
     screen: 'pos',
-    device: 'counter',
+    image: '05-inside.png',
+    device: 'phone',
   },
   {
     id: 'carry',
@@ -136,15 +210,18 @@ const JOURNEY = [
     title: 'They carry it home',
     line: 'Credits, points and the next class, in their pocket.',
     screen: 'member',
+    image: '06-carry.png',
     device: 'phone',
   },
   {
+    // `monitor` (2:1), not `desktop` (16:10) — the dashboard file is 1920x959.
     id: 'hub',
     n: '07',
     title: 'You see all of it',
     line: 'Every outlet, on one screen.',
     screen: 'qhub',
-    device: 'desktop',
+    image: '07-hub.png',
+    device: 'monitor',
   },
 ]
 
@@ -227,6 +304,8 @@ const BUILDS = [
       'The member list was hidden outright. Search returns the one matched record and nothing else — nothing to scroll, nothing to copy.',
     before: 'Full list exposed on search',
     after: 'Only the matched record',
+    beforeVideo: 'privacy-before.mp4',
+    afterVideo: 'privacy-after.mp4',
   },
   {
     id: 'booking',
@@ -238,6 +317,8 @@ const BUILDS = [
       'The booking module was plugged straight into their setup. Walk-ins and reservations are worked from one screen — no third-party app, no second login.',
     before: 'Second app, second login',
     after: 'One screen, one record',
+    beforeVideo: 'booking-before.mp4',
+    afterVideo: 'booking-after.mp4',
   },
   {
     id: 'wallet',
@@ -247,8 +328,21 @@ const BUILDS = [
       'They wanted ticket sales at the counter and their own branded wallet — points earned at the gate and spent anywhere inside the park.',
     fix:
       'Tickets, points and balance run natively. Visitors buy, earn instantly, and spend at any food stall or gift shop in the park. No third-party wallet app.',
+    /* These two arrived carrying the BOOKING captions burnt in — "Second app,
+       second login" / "One screen, one record" — which is why they were held
+       back at first. It turned out not to matter: the title block is cut at
+       encode time (see BuildClip), so what reaches the page is the animation
+       with no words on it at all, and the only copy on this card is the live
+       text below. Confirmed frame by frame after the crop.
+
+       The footage shows reservations and walk-ins rather than tickets and a
+       points balance. Kept anyway on the operator's say-so — a park takes
+       bookings too — but it is the one pair here whose picture is not literally
+       what its two lines describe. */
     before: 'Third-party wallet, points siloed',
     after: 'Branded, native, one tap',
+    beforeVideo: 'wallet-before.mp4',
+    afterVideo: 'wallet-after.mp4',
   },
 ]
 
@@ -696,9 +790,7 @@ function JourneySequence() {
                 layout never moves between steps. See the note on Device. */}
             <div className="h-[46svh] sm:h-[54svh] lg:col-span-6 lg:col-start-7 lg:h-[64svh]">
               <Device kind={step.device}>
-                <Swap id={step.screen} y={10} duration={0.42} className="h-full">
-                  <ProductScreen name={step.screen} />
-                </Swap>
+                <StepVisual step={step} />
               </Device>
             </div>
 
@@ -729,9 +821,13 @@ function JourneyStacked() {
                   {step.title}
                 </h3>
                 <p className="mt-2.5 text-[0.95rem] leading-relaxed text-white/60">{step.line}</p>
+                {/* Phones and reduced motion get the same visual as the rig —
+                    the real screenshot where there is one. Rendering the drawn
+                    UI here while desktop showed a photograph would make the two
+                    fallbacks disagree about what the product looks like. */}
                 <div className="mt-6 h-[52svh]">
                   <Device kind={step.device}>
-                    <ProductScreen name={step.screen} />
+                    <StepVisual step={step} />
                   </Device>
                 </div>
               </Reveal>
@@ -1122,6 +1218,54 @@ function CostSection() {
   )
 }
 
+/* One half of a build's before/after pair.
+
+   THE FILES ARE RE-FRAMED AT ENCODE TIME, twice over, and both crops matter.
+
+   1. THE TITLE IS CUT. Each clip was supplied 1920x1080 with its own
+      "BEFORE / Full list exposed on search" burnt into the top quarter — the
+      same words the card underneath already sets as live text. Shown whole,
+      every pair said everything twice. The depth was measured rather than
+      guessed: the title sits at a different height in every clip (subtitle
+      bottoms ranged y=181 to y=277), so the cut is the deepest of them plus
+      margin. Anything shallower left a ghost floating above the live label.
+
+   2. THE CONTENT IS FRAMED. What was left was mostly empty background — the
+      privacy "after" card filled 21% of the width and 30% of the height, so
+      even in a 679px-wide slot it rendered about the size of a postage stamp.
+      Each clip is now cropped to its own measured content box and blown up to
+      16:9: a 1.4x zoom for most, 4x for that one.
+
+   The zoom is per clip but the OUTPUT IS UNIFORM 16:9, which is the point —
+   the two halves of a pair sit side by side and have to agree on shape even
+   though one may be a full-screen grid and the other a single card.
+
+   Net effect: the film is the animation only, filling its frame, and the label
+   stays real text — selectable, translatable, readable by a screen reader.
+
+   Optional by design. A build with no clip renders its text card exactly as
+   before, which is what keeps the wallet build shippable while its footage
+   does not exist.
+
+   `CinematicVideo` brings the shared behaviour the rest of the site uses:
+   nothing downloads until the frame is near the viewport, playback starts on
+   entry and PAUSES on exit. That matters here more than elsewhere — hovering
+   the list on the left swaps this panel, so a visitor can put four of these on
+   screen inside a few seconds. */
+function BuildClip({ src, label }) {
+  if (!src) return null
+  const base = import.meta.env.BASE_URL
+  return (
+    <CinematicVideo
+      ratio="wide"
+      src={`${base}video/qstudio/custom/${src}`}
+      poster={`${base}video/qstudio/custom/${src.replace('.mp4', '-poster.jpg')}`}
+      label={label}
+      className="w-full"
+    />
+  )
+}
+
 /* ---------------------------------------------------------------------------
    Configured, not templated.
 
@@ -1196,24 +1340,47 @@ function CustomSection() {
               What we did
             </p>
             <p className="mt-4 text-[1rem] leading-relaxed text-white">{build.fix}</p>
-
-            <div className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10">
-              <div className="bg-ink-950 p-5 sm:p-6">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">
-                  Before
-                </p>
-                <p className="mt-3 text-[0.9rem] leading-snug text-white/40">{build.before}</p>
-              </div>
-              <div className="bg-ink-950 p-5 sm:p-6">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-accent-400">
-                  After
-                </p>
-                <p className="mt-3 text-[0.9rem] leading-snug text-white">{build.after}</p>
-              </div>
-            </div>
           </Swap>
         </div>
       </div>
+
+      {/* THE EVIDENCE, FULL WIDTH — and it is out here rather than inside the
+          right-hand column for one reason: size. Nested in `lg:col-span-6` each
+          clip rendered 282px wide on a 1440 laptop and 170px on a phone, at
+          which point a screen full of member records is a red smudge and the
+          whole before/after argument is lost. Out here each one is ~740px,
+          which is the width the files are actually authored at (760), so they
+          play close to 1:1 with no upscaling.
+
+          One column below `sm`: side by side on a phone was what made these
+          unreadable in the first place, and stacking them costs nothing — the
+          labels still say which is which.
+
+          `items-start` so a build with no film would not stretch to match one
+          that has it. All three have film now; the guard stays because
+          BuildClip is deliberately optional. */}
+      <Swap id={`${build.id}-evidence`} y={12} className="mt-12 sm:mt-14">
+        <div className="grid grid-cols-1 items-start gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2">
+          <div className="bg-ink-950">
+            <BuildClip src={build.beforeVideo} label={`Before — ${build.before}`} />
+            <div className="p-5 sm:p-6">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">
+                Before
+              </p>
+              <p className="mt-3 text-[0.95rem] leading-snug text-white/40">{build.before}</p>
+            </div>
+          </div>
+          <div className="bg-ink-950">
+            <BuildClip src={build.afterVideo} label={`After — ${build.after}`} />
+            <div className="p-5 sm:p-6">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-accent-400">
+                After
+              </p>
+              <p className="mt-3 text-[0.95rem] leading-snug text-white">{build.after}</p>
+            </div>
+          </div>
+        </div>
+      </Swap>
 
       <Reveal>
         <div className="mt-16 border-t border-white/10 pt-12">

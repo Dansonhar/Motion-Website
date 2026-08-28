@@ -8,7 +8,19 @@
       content="Connected gym entrance system — self-service membership kiosk, MT119-LED tripod turnstile, QR check-in, NFC access, payments and automated entry control."
     />
     <title>GymAccess — Smarter Gym Access Starts Here</title>
-    <link rel="preload" as="video" href="%BASE_URL%video/gym-hero.mp4" type="video/mp4" />
+    <!-- There was a <link rel="preload" as="video"> for video/gym-hero.mp4 here.
+         TWO THINGS WERE WRONG WITH IT and both are why it is gone rather than
+         corrected:
+
+         1. THE FILE DOES NOT EXIST. The gym hero is video/gym/hero.mp4. So every
+            single page load fired a highest-priority request that 404'd.
+         2. Even pointing at the right file it would be wrong four times out of
+            five. Which attraction renders is decided at runtime from
+            localStorage, so a static preload of the GYM hero is dead weight on
+            Theme Park, Solution, STUDIO and Salons — a multi-megabyte download
+            competing with the hero those pages actually need.
+
+         The hero <video> elements start themselves; nothing here has to help. -->
   </head>
   <body>
     <div id="root"></div>

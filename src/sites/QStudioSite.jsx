@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useMotionValueEvent, useScroll, useTransform } from 'framer-motion'
 import {
   ArrowRight,
   Building2,
@@ -526,6 +526,14 @@ const JOBS = [
   },
 ]
 
+/* `video` is footage of that sector's own room, in public/video/qstudio/sectors/,
+   and where it exists it REPLACES both the still and the drawn device overlay —
+   see SectorMedia for why both, not just the still.
+
+   `image` stays required even though all four now have film. It is the poster
+   while a film buffers, it is what reduced-motion visitors see, and it is what
+   a sector falls back to if its clip is ever pulled. Never remove one when
+   adding the other. */
 const SECTORS = [
   {
     id: 'gym',
@@ -535,6 +543,7 @@ const SECTORS = [
     screen: 'booking',
     device: 'phone',
     image: 'sector-gym.jpg',
+    video: 'gym.mp4',
     alt: 'Two members using a self-service STUDIO kiosk on a gym floor',
   },
   {
@@ -545,6 +554,7 @@ const SECTORS = [
     screen: 'kiosk',
     device: 'kiosk',
     image: 'sector-park.jpg',
+    video: 'park.mp4',
     alt: 'Families at ticketing kiosks and entry gates in an indoor playground',
   },
   {
@@ -555,6 +565,7 @@ const SECTORS = [
     screen: 'member',
     device: 'phone',
     image: 'sector-salon.jpg',
+    video: 'salon.mp4',
     alt: 'A customer booking a treatment at a kiosk in a salon reception',
   },
   {
@@ -565,6 +576,7 @@ const SECTORS = [
     screen: 'faceid',
     device: 'kiosk',
     image: 'sector-club.jpg',
+    video: 'club.mp4',
     alt: 'A wellness centre reception with a self check-in station beside the desk',
   },
 ]
@@ -1407,8 +1419,116 @@ function CustomSection() {
 /* ---------------------------------------------------------------------------
    Who it is for — a reveal, not a card grid. Picking a sector changes the
    screen beside it, so the breadth is demonstrated rather than asserted.
+
+   TWO RIGS, ONE SECTION, and the split is not decoration.
+
+   On a pointer device the list is HOVERED and the panel beside it rewrites, so
+   the whole section is read in one screenful. A phone has neither of those:
+   there is no hover to drive the swap, and the panel sits a full screen below
+   the list, so a tap changes something the visitor cannot see. That is why this
+   section is the one place on the page where a phone gets MORE motion, not
+   less — the scroll itself becomes the control. The section pins and each
+   swipe advances to the next sector, list and film moving together in view.
+
+   REDUCED MOTION STILL GETS THE TAP LIST. A pinned runway is scrubbed by
+   scrolling and cannot be opted out of once entered, so someone who asked their
+   OS for less movement keeps the plain stacked version. This is the deliberate
+   exception to useSimpleMotion's usual `mobile || reduced` branch: here the two
+   halves of that flag mean opposite things.
    --------------------------------------------------------------------------- */
 function WhoSection() {
+  const { mobile, reduced } = useSimpleMotion()
+  if (mobile && !reduced) return <WhoScroll />
+  return <WhoStatic />
+}
+
+/* One sector row, shared by both rigs. `hover` is what separates them: on a
+   pointer device pointing at a row selects it, on the pinned phone rig the row
+   is a seek button and selection belongs to the scroll position. */
+function SectorRow({ sector, on, onSelect, hover = false, compact = false }) {
+  const Icon = sector.icon
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={onSelect}
+        onMouseEnter={hover ? onSelect : undefined}
+        onFocus={hover ? onSelect : undefined}
+        aria-pressed={on}
+        className={`group flex w-full items-center gap-4 border-b border-white/10 text-left outline-none sm:gap-5 ${
+          compact ? 'py-3.5' : 'py-6 sm:py-7'
+        }`}
+      >
+        <span
+          className={`grid shrink-0 place-items-center rounded-full border transition-colors duration-500 ${
+            compact ? 'size-9' : 'size-11'
+          } ${
+            on
+              ? 'border-white/40 bg-white/10 text-white'
+              : 'border-white/12 bg-white/[0.03] text-white/50 group-hover:border-white/25'
+          }`}
+        >
+          <Icon className={compact ? 'size-4' : 'size-[18px]'} strokeWidth={1.75} aria-hidden />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span
+            className={`block font-bold leading-tight tracking-tight transition-colors duration-500 ${
+              compact ? 'text-[1.05rem]' : 'text-[clamp(1.15rem,1.9vw,1.7rem)]'
+            } ${on ? 'text-white' : 'text-white/45 group-hover:text-white/75'}`}
+          >
+            {sector.name}
+          </span>
+          <motion.span
+            animate={{ opacity: on ? 1 : 0, height: on ? 'auto' : 0 }}
+            transition={{ duration: 0.45, ease: EASE }}
+            className={`block overflow-hidden leading-relaxed text-white/55 ${
+              compact ? 'text-[0.82rem]' : 'text-[0.9rem]'
+            }`}
+          >
+            <span className="block pt-1.5">{sector.line}</span>
+          </motion.span>
+        </span>
+        <span
+          className={`h-px shrink-0 transition-all duration-500 ${
+            on ? 'w-10 bg-white/60' : 'w-4 bg-white/15'
+          }`}
+        />
+      </button>
+    </li>
+  )
+}
+
+/* The chips. Same list under both rigs — on the pinned phone version they sit
+   AFTER the runway, in ordinary flow, so the section still ends on something
+   scrollable rather than releasing the pin onto the next section's headline. */
+function AlsoWorksFor({ className = 'mt-14 lg:mt-20' }) {
+  return (
+    <Reveal>
+      {/* Extra clearance: the device inset above hangs ~24px below its frame,
+          so the stock mt-14 had it nearly touching this label on desktop. The
+          pinned phone rig overrides it — the stage releases with its rail at
+          the very bottom of the screen, so it needs a fraction of that. */}
+      <div className={className}>
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-white/40">
+          Also works for
+        </p>
+        <ul className="mt-5 flex flex-wrap gap-2.5">
+          {ALSO.map((a) => (
+            <li
+              key={a}
+              className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[0.85rem] text-white/60 transition-colors duration-300 hover:border-white/25 hover:text-white"
+            >
+              {a}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Reveal>
+  )
+}
+
+/* The pointer / reduced-motion rig — unchanged behaviour. */
+function WhoStatic() {
   const [active, setActive] = useState(0)
   const sector = SECTORS[active]
 
@@ -1423,53 +1543,15 @@ function WhoSection() {
 
       <div className="mt-12 grid grid-cols-1 gap-10 sm:mt-16 lg:grid-cols-12 lg:gap-16">
         <ul className="lg:col-span-5">
-          {SECTORS.map((s, i) => {
-            const Icon = s.icon
-            const on = i === active
-            return (
-              <li key={s.id}>
-                <button
-                  type="button"
-                  onClick={() => setActive(i)}
-                  onMouseEnter={() => setActive(i)}
-                  onFocus={() => setActive(i)}
-                  aria-pressed={on}
-                  className="group flex w-full items-center gap-5 border-b border-white/10 py-6 text-left outline-none sm:py-7"
-                >
-                  <span
-                    className={`grid size-11 shrink-0 place-items-center rounded-full border transition-colors duration-500 ${
-                      on
-                        ? 'border-white/40 bg-white/10 text-white'
-                        : 'border-white/12 bg-white/[0.03] text-white/50 group-hover:border-white/25'
-                    }`}
-                  >
-                    <Icon className="size-[18px]" strokeWidth={1.75} aria-hidden />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span
-                      className={`block text-[clamp(1.15rem,1.9vw,1.7rem)] leading-tight font-bold tracking-tight transition-colors duration-500 ${
-                        on ? 'text-white' : 'text-white/45 group-hover:text-white/75'
-                      }`}
-                    >
-                      {s.name}
-                    </span>
-                    <motion.span
-                      animate={{ opacity: on ? 1 : 0, height: on ? 'auto' : 0 }}
-                      transition={{ duration: 0.45, ease: EASE }}
-                      className="block overflow-hidden text-[0.9rem] leading-relaxed text-white/55"
-                    >
-                      <span className="block pt-2">{s.line}</span>
-                    </motion.span>
-                  </span>
-                  <span
-                    className={`h-px shrink-0 transition-all duration-500 ${
-                      on ? 'w-10 bg-white/60' : 'w-4 bg-white/15'
-                    }`}
-                  />
-                </button>
-              </li>
-            )
-          })}
+          {SECTORS.map((s, i) => (
+            <SectorRow
+              key={s.id}
+              sector={s}
+              on={i === active}
+              onSelect={() => setActive(i)}
+              hover
+            />
+          ))}
         </ul>
 
         <div className="lg:col-span-6 lg:col-start-7">
@@ -1477,26 +1559,149 @@ function WhoSection() {
         </div>
       </div>
 
-      <Reveal>
-        {/* Extra clearance: the device inset above hangs ~24px below its frame,
-            so the stock mt-14 had it nearly touching this label on desktop. */}
-        <div className="mt-14 lg:mt-20">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/40">
-            Also works for
-          </p>
-          <ul className="mt-5 flex flex-wrap gap-2.5">
-            {ALSO.map((a) => (
-              <li
-                key={a}
-                className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[0.85rem] text-white/60 transition-colors duration-300 hover:border-white/25 hover:text-white"
-              >
-                {a}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Reveal>
+      <AlsoWorksFor />
     </SectionShell>
+  )
+}
+
+/* The phone rig. A tall runway with a pinned stage inside it, exactly the
+   shape StickyStage builds — written out here rather than reused because
+   StickyStage refuses to pin on a phone by design, and this section is the one
+   documented exception to that rule.
+
+   THE RUNWAY IS DELIBERATELY SHORT. 70svh per sector is a little under one
+   thumb-flick each: long enough that the cross-fade lands before the next
+   sector arrives, short enough that four of them is not a section a visitor
+   feels trapped in. Anything past ~90 reads as stuck.
+
+   `svh` THROUGHOUT, not `vh`. On mobile Safari `vh` is the tall viewport, so a
+   100vh stage inside a vh runway grows and shrinks as the URL bar hides —
+   which moves the scroll position under the visitor's thumb mid-transition.
+   --------------------------------------------------------------------------- */
+const SECTOR_STEP_SVH = 70
+
+function WhoScroll() {
+  const runwayRef = useRef(null)
+  const count = SECTORS.length
+  const [active, setActive] = useState(0)
+  const sector = SECTORS[active]
+
+  const { scrollYProgress } = useScroll({
+    target: runwayRef,
+    offset: ['start start', 'end end'],
+  })
+
+  /* Each sector owns 1/count of the travel and the last one holds its slot to
+     the end — without the clamp the fourth would exist only at progress === 1,
+     which is a single pixel of scroll. */
+  useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    const next = Math.min(count - 1, Math.max(0, Math.floor(v * count)))
+    setActive((prev) => (prev === next ? prev : next))
+  })
+
+  /* The film drifts against the scroll across the whole runway. It is 14px
+     total — the point is that the frame is alive between the swaps, not that
+     anything is seen to move. */
+  const drift = useTransform(scrollYProgress, [0, 1], [7, -7])
+
+  /* Scroll to the middle of a sector's slot, so tapping a row or a rail
+     segment lands on that sector rather than on its boundary. The rect is read
+     live: a lazy section above this one changing height would invalidate any
+     cached offset. */
+  const seek = (i) => {
+    const el = runwayRef.current
+    if (!el) return
+    const top = el.getBoundingClientRect().top + window.scrollY
+    const runway = el.offsetHeight - window.innerHeight
+    if (runway <= 0) return
+    window.scrollTo({ top: top + runway * ((i + 0.5) / count), behavior: 'smooth' })
+  }
+
+  return (
+    <section id="who" aria-label="Who it is for" className="px-6 py-14">
+      <div className="mx-auto max-w-[1500px]">
+        <div className="sol-rule mb-10 w-full" />
+        <Reveal>
+          <Eyebrow>Who it’s for</Eyebrow>
+          <Display className="mt-7 max-w-[18ch]">
+            If they walk in, book a slot, or hold a membership.
+          </Display>
+        </Reveal>
+
+        <div
+          ref={runwayRef}
+          className="relative mt-8"
+          style={{ height: `${count * SECTOR_STEP_SVH + 100}svh` }}
+        >
+          {/* THE STAGE FILLS EXACTLY ONE SCREEN, and every child is either
+              `shrink-0` or the one flexible box. An earlier version centred a
+              fixed-height stack inside 100svh, which is where the dead bands
+              came from: content that measures ~640px in a 780px box leaves 70px
+              of empty page above the list and 70px below the rail, and both are
+              visible for the whole section because the stage is pinned.
+
+              So the film is the flexible element — it absorbs the difference,
+              on any phone from a 667px SE to a 932px Pro Max, and the stack
+              always comes to exactly the height of the screen. `min-h-0` is
+              required: a flex child defaults to min-height:auto and would
+              refuse to shrink below the video's own size, pushing the rail off
+              the bottom on short screens.
+
+              THE NAVBAR IS CLEARED WITH `top-16`, NOT WITH TOP PADDING. The bar
+              is fixed and exactly 64px tall on a phone, so anything pinned to
+              top-0 spends the section underneath it — but paying for it with
+              `pt-16` inside the stage puts 64px of empty page above the list
+              for the whole approach, before the stage has pinned to anything.
+              Sticking 64px down and taking those 64px off the height costs
+              nothing until the moment it is needed. */}
+          <div className="sticky top-16 flex h-[calc(100svh-4rem)] flex-col gap-4 overflow-hidden pb-5">
+            <ul className="shrink-0">
+              {SECTORS.map((s, i) => (
+                <SectorRow
+                  key={s.id}
+                  sector={s}
+                  on={i === active}
+                  onSelect={() => seek(i)}
+                  compact
+                />
+              ))}
+            </ul>
+
+            <motion.div style={{ y: drift }} className="min-h-0 flex-1">
+              <SectorMedia sector={sector} fill />
+            </motion.div>
+
+            {/* Position read-out and remote control. The rail is what tells a
+                visitor the section has four states and that scrolling is what
+                moves between them — without it a pinned page reads as frozen. */}
+            <nav aria-label="Sectors" className="flex shrink-0 items-center gap-2">
+              {SECTORS.map((s, i) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => seek(i)}
+                  aria-current={i === active ? 'true' : undefined}
+                  aria-label={`Show ${s.name}`}
+                  className="flex-1 py-1.5 outline-none"
+                >
+                  <span
+                    className={`block h-[2px] w-full rounded-full transition-colors duration-500 ${
+                      i === active ? 'bg-white' : i < active ? 'bg-white/45' : 'bg-white/15'
+                    }`}
+                  />
+                </button>
+              ))}
+              <span className="ml-2 shrink-0 text-[10px] font-semibold uppercase tracking-[0.25em] tabular-nums text-white/35">
+                {String(active + 1).padStart(2, '0')}
+                <span className="text-white/20"> / {String(count).padStart(2, '0')}</span>
+              </span>
+            </nav>
+          </div>
+        </div>
+
+        <AlsoWorksFor className="mt-10" />
+      </div>
+    </section>
   )
 }
 
@@ -1523,22 +1728,46 @@ function WhoSection() {
    one thing the picture was taken for. Bottom-left is floor in every one of
    them. Re-check this if the photography is ever reshot.
    --------------------------------------------------------------------------- */
-function SectorMedia({ sector }) {
+function SectorMedia({ sector, fill = false }) {
   const base = import.meta.env.BASE_URL
 
+  /* `fill` is for the pinned phone rig: there the frame takes whatever
+     height is left in the stage rather than setting its own, so the stage
+     always adds up to exactly one screen and never leaves a band of empty
+     page above or below the content. Everywhere else the 3:2 ratio stands
+     — see the note above on why it is that number. */
   return (
-    <div className="relative">
-      <div className="relative aspect-[3/2] overflow-hidden rounded-3xl border border-white/10 bg-ink-950">
+    <div className={`relative ${fill ? 'h-full' : ''}`}>
+      <div
+        className={`relative overflow-hidden rounded-3xl border border-white/10 bg-ink-950 ${
+          fill ? 'h-full' : 'aspect-[3/2]'
+        }`}
+      >
         <Swap id={sector.id} y={0} duration={0.55} className="h-full">
-          <img
-            src={`${base}${IMG}${sector.image}`}
-            alt={sector.alt}
-            /* Four of these exist and only one is ever on screen, so none of
-               them should block the section above from painting. */
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover"
-          />
+          {sector.video ? (
+            /* The still stays on as the poster, so the swap never shows an
+               empty box while the film buffers. Cropped to 3:2 at encode time
+               rather than by the browser — the sources are 16:9 and
+               `object-cover` would have thrown away a sixth of every one of
+               them, which on these shots is where the room is. */
+            <CinematicVideo
+              ratio="fill"
+              src={`${base}video/qstudio/sectors/${sector.video}`}
+              poster={`${base}video/qstudio/sectors/${sector.video.replace('.mp4', '-poster.jpg')}`}
+              label={sector.alt}
+              className="h-full w-full"
+            />
+          ) : (
+            <img
+              src={`${base}${IMG}${sector.image}`}
+              alt={sector.alt}
+              /* Four of these exist and only one is ever on screen, so none of
+                 them should block the section above from painting. */
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover"
+            />
+          )}
         </Swap>
 
         {/* Grounds the device against the still — weighted to the corner the
@@ -1553,11 +1782,34 @@ function SectorMedia({ sector }) {
           flush inside reads as picture-in-picture, overlapping reads as one
           composition.
 
+          NOT DRAWN OVER FOOTAGE. Where a sector has film, the film already
+          shows a real kiosk running a real screen, and pasting our drawn device
+          on top of it puts two devices in one shot — the invented one covering
+          the photographed one. The overlay is for the stills, which have no
+          product in them; it disappears the moment a sector gets footage.
+
+          ALL FOUR SECTORS NOW HAVE FILM, so nothing on this page renders it
+          today. It is kept rather than deleted because `video` is optional by
+          design — a fifth sector, or a pulled clip, brings it straight back.
+
           HIDDEN ON PHONES. The frame is only ~230px tall there, which put a
           kiosk at about 80px wide — present, covering a third of the
           photograph, and showing nothing legible. The journey rig above already
           gives phones every screen at full size, so this loses nothing. */}
-      <div className="absolute -bottom-6 -left-4 hidden h-[62%] sm:block">
+      {/* `w-[30%]` IS REQUIRED, not cosmetic. This holder is absolutely
+          positioned with a height and no width, so its width is shrink-to-fit
+          — and Device now fits its form factor to the box it is given, so a box
+          with no width collapsed the kiosk to 14x22px. (It survived the old
+          height-plus-aspect-ratio Device by accident: the frame set its own
+          width and the auto-width parent grew to match.) 30% covers the widest
+          form factor this section uses — a 10:16 kiosk at h-[62%] of a 3:2
+          panel needs 26% — with room to spare. A wide form here, `counter` or
+          `desktop`, would need about 66% and this number revisited. */}
+      <div
+        className={`absolute -bottom-6 -left-4 h-[62%] w-[30%] ${
+          sector.video ? 'hidden' : 'hidden sm:block'
+        }`}
+      >
         <Device kind={sector.device}>
           <Swap id={sector.screen} y={10} duration={0.4} className="h-full">
             <ProductScreen name={sector.screen} />

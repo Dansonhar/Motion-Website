@@ -67,7 +67,6 @@ export default function Navbar() {
             >
               <Layers size={15} className="text-accent-400" />
               {/* Labels a demo switcher, not a destination — first to go. */}
-              <span className="hidden 2xl:inline">Attractions:</span>
               <span className="font-semibold">{current.label}</span>
               <ChevronDown
                 size={15}

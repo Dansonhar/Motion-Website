@@ -31,7 +31,7 @@ const BENEFITS = [
 
 export default function Benefits() {
   return (
-    <section className="lazy-section relative py-24 sm:py-32">
+    <section id="benefits" className="lazy-section relative scroll-mt-24 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <SectionHeading
           eyebrow="Operational Benefits"

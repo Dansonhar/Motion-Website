@@ -35,15 +35,25 @@ import { Display, EASE, Eyebrow, Lede, Reveal, SectionShell } from './SolutionPr
 
    COPY RULE, same as everywhere else on this page: every line below describes
    work this practice actually does, in language an operator in that trade would
-   use. No invented client, no invented number. The Salon entry ships `soon`
-   and its door says so — an unbuilt sector is named honestly rather than
-   dressed up as a live one.
+   use. No invented client, no invented number. An unbuilt sector is named
+   honestly rather than dressed up as a live one — which is what `soon` is for,
+   and why the Salon entry carried it while it was on show.
    --------------------------------------------------------------------------- */
 
 /* `attraction` is the id in attractions.jsx this door opens. `soon` marks a
    sector we are building for but have not published a site for — the door
    still opens (the destination says so plainly), it is just labelled up front
-   so nobody feels tricked into a dead end. */
+   so nobody feels tricked into a dead end.
+
+   `hidden` withdraws a door from the wall without deleting it, and it must be
+   kept in step with the same flag on the matching entry in attractions.jsx.
+   Hiding only one of the two leaves either a door with no room behind it, or a
+   room nothing reaches.
+
+   `n` IS HARDCODED, not derived from position. The one hidden today is the last
+   one, so the wall still reads 01, 02 with no gap. Hide a middle door and the
+   numbers skip — renumber the survivors by hand, or drive `n` off the SHOWN
+   index instead. */
 const DOORS = [
   {
     id: 'gym',
@@ -88,6 +98,10 @@ const DOORS = [
     name: 'Salons & Spa',
     line: 'The product is an hour of a named person’s time.',
     soon: true,
+    // Withdrawn from the wall. Delete this line and the `hidden` on the salon
+    // entry in attractions.jsx to bring the sector back; the copy below is
+    // finished and needs no other change.
+    hidden: true,
     brief:
       'The business sells a practitioner’s diary, not a shelf of stock. The system has to protect that diary, follow the client between visits, and split the takings correctly at the end of the day.',
     built: [
@@ -99,12 +113,17 @@ const DOORS = [
   },
 ]
 
+/* The doors actually on the wall. Everything below indexes into THIS list, not
+   into DOORS — `active` is a position on screen, so a hidden entry must not
+   occupy one or the panel would open on a door nobody can see. */
+const SHOWN = DOORS.filter((d) => !d.hidden)
+
 export default function IndustryChooser() {
   const { setAttraction } = useAttraction()
   /* Index rather than id: this is "which door is being read", and it always
      has an answer, so the panel is never empty on a screen with no pointer. */
   const [active, setActive] = useState(0)
-  const door = DOORS[active]
+  const door = SHOWN[active]
 
   /* Two refs, and both exist because of one bug found on a real touch device.
 
@@ -158,7 +177,7 @@ export default function IndustryChooser() {
       <div className="mt-12 grid grid-cols-1 gap-10 sm:mt-16 lg:grid-cols-12 lg:gap-14">
         <div className="lg:col-span-7">
           <ul className="border-t border-white/10">
-            {DOORS.map((d, i) => {
+            {SHOWN.map((d, i) => {
               const Icon = d.icon
               const on = active === i
               return (

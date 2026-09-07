@@ -39,7 +39,7 @@ function CountUp({ to, prefix = '', suffix = '', duration = 1.6 }) {
 
 export default function StatsBand() {
   return (
-    <section className="lazy-section relative py-16 sm:py-20">
+    <section id="results" className="lazy-section relative scroll-mt-24 py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 28 }}

@@ -193,6 +193,54 @@ const CLIENTS = [
        big a mark looks; set by ink area, checked by eye. */
     logoClass: 'max-h-[68%]',
   },
+  {
+    id: 'ripleys',
+    name: 'Ripley’s Believe It or Not! Interactive Museum',
+    /* SUPPLIED ON ITS RED GROUND — a 225x225 tile, 72% of it red field. Dropped
+       in as-is it would be the one plate on a wall of free-standing marks, and
+       `max-h` would have acted on the red padding rather than on the mark. So
+       the ground is keyed out and the file trimmed to its ink; the original is
+       kept beside it as `ripleys-red.png` for any light-background use, the
+       same way `owg.png` is.
+
+       NO INK WAS RECOLOURED. The key is a distance-from-background mask with
+       the ramp set at 55-95 — comfortably above the red field's own gradient
+       (the corners sit 34 from the median, which a tighter ramp read as ink and
+       which is why the first attempt would not trim) and far below the letters
+       at 165+. Colour is passed through untouched, so the white, the yellow and
+       the black outline are the client's own values. An earlier pass keyed with
+       a wide tolerance instead and pulled the yellow to orange.
+
+       THE RED ALSO BLED ONTO THE BLACK OUTLINE, and that halo was the real
+       defect — a red glow around every letter, invisible while the mark was
+       small and obvious once it was sized up. Keying alone does not remove it:
+       a 50/50 black/red edge pixel sits ~119 from the background, past the
+       ramp, so it stays fully opaque and stays dark red. Fixed by unmixing
+       (F = (P - (1-a)*BG)/a) and then pulling red-dominant, low-green pixels
+       back to neutral — safe because this mark has no red ink of its own, only
+       white, yellow and black. 1191 pixels were carrying spill.
+
+       THE FILE IS A 2x LANCZOS UPSCALE (324x268) OF 162x134 OF REAL INK, and
+       that is not about sharpness — it is what lets the mark reach its size at
+       all. `max-h` only ever SHRINKS: the other two marks are taller than the
+       row so the cap pulls them down, but at native 134px this one sat under
+       the cap and rendered at intrinsic size, ignoring it. With 268px of source
+       the cap governs, and the browser downscales rather than stretches.
+       Quantized to 32 colours / 16 alpha levels to keep it near the weight of
+       the other two (14kB native would not reach the size; 184kB unquantized
+       was not worth it). A vector or a larger reversed file from the client is
+       still the real upgrade — swap it in and nothing else changes. */
+    logo: 'ripleys.png',
+    /* SET BY EYE, AGAINST THE INK-AREA RULE ABOVE — deliberately.
+
+       Ink area put this at 60% (0.60^2 x 1.21 aspect x 0.64 density = 0.28,
+       between OWG's 0.26 and Jadioc's 0.30) and on screen it read clearly
+       smaller than both. The rule assumes ink is distributed as one shape;
+       this mark spends its ink on four lines of small dense type, so matching
+       the area matches the wrong thing. Box size is the better proxy here:
+       88% gives 188x155 against OWG's 170x176 and Jadioc's 204x120. */
+    logoClass: 'max-h-[88%]',
+  },
 ]
 
 const SHOWN = CLIENTS.filter((c) => c.logo)

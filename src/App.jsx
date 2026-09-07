@@ -1,6 +1,6 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useLayoutEffect, useRef } from 'react'
 import { MotionConfig } from 'framer-motion'
-import { AttractionProvider, useAttraction } from './attractions.jsx'
+import { AttractionProvider, jumpToTop, useAttraction } from './attractions.jsx'
 import Navbar from './components/Navbar.jsx'
 import ScrollProgress from './components/ScrollProgress.jsx'
 
@@ -15,6 +15,31 @@ const Footer = lazy(() => import('./components/Footer.jsx'))
 function Shell() {
   const { current } = useAttraction()
   const standalone = Boolean(current.standalone)
+
+  /* A SECOND PIN, AFTER THE NEW PAGE IS ACTUALLY ON SCREEN.
+
+     `setAttraction` jumps to the top before the swap, which handles the
+     outgoing page. This handles the incoming one. The switch replaces the
+     document wholesale and its height changes in a single frame — Solution is
+     9,580px, Gym is 23,874px — and the new tree mounts a beat later, behind a
+     Suspense fallback if its chunk is not cached yet. Anything in that gap that
+     can move the viewport (scroll anchoring reaching for a box that no longer
+     exists, a lazy chunk landing, a restored position) would leave the visitor
+     part-way down a page they have just opened.
+
+     `useLayoutEffect`, not `useEffect`: this has to land before the browser
+     paints the new page, or the correction is itself a visible jump.
+
+     Skipped on the very first mount so a deep link still resolves — the only
+     time the initial scroll position is meant to be anything but zero. */
+  const mounted = useRef(false)
+  useLayoutEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true
+      return
+    }
+    jumpToTop()
+  }, [current.id])
 
   const site =
     current.id === 'solution' ? (

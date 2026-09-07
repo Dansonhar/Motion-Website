@@ -566,7 +566,10 @@ export default function ThemeParkSite() {
         </div>
 
         {/* ---- the guest journey, end to end ---- */}
-        <div className="mt-24 border-t border-white/8 pt-16 sm:mt-28 sm:pt-20">
+        <div
+          id="park-journey"
+          className="mt-24 scroll-mt-24 border-t border-white/8 pt-16 sm:mt-28 sm:pt-20"
+        >
           <motion.div
             initial={{ opacity: 0, y: 22 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -625,11 +628,12 @@ export default function ThemeParkSite() {
 
         {/* ---- closing ---- */}
         <motion.div
+          id="park-contact"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="glass mt-24 rounded-3xl px-8 py-12 text-center sm:mt-28 sm:px-14 sm:py-16"
+          className="glass mt-24 scroll-mt-24 rounded-3xl px-8 py-12 text-center sm:mt-28 sm:px-14 sm:py-16"
         >
           <h2 className="mx-auto max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Sell everywhere. Manage it in one place.

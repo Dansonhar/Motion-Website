@@ -109,7 +109,7 @@ const SYSTEMS = [
 
 export default function TechnologyLayer() {
   return (
-    <SectionShell label="Where the business meets its customers" className="bg-ink-900">
+    <SectionShell id="technology" label="Where the business meets its customers" className="bg-ink-900">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-6">
           <Reveal>

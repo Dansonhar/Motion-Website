@@ -146,7 +146,7 @@ const JOURNEY = [
     title: 'They find you',
     line: 'Plans and classes, bookable from your own site.',
     screen: 'webstore',
-    image: '01-discover.png',
+    image: '01-discover.jpg',
     device: 'phone',
   },
   {
@@ -1824,6 +1824,11 @@ function SectorMedia({ sector, fill = false }) {
    The door. Two hardware options, switched by the visitor — and the one hard
    number the source site publishes, animated rather than stated twice.
    --------------------------------------------------------------------------- */
+/* `video` is footage of that hardware working, in public/video/qstudio/door/,
+   cropped to the panel's 3:2 at encode time. It is OPTIONAL and `image` is not:
+   the still is the poster while the film buffers, what a reduced-motion visitor
+   is left looking at, and the fallback if a clip is ever pulled. Door Lock has
+   no film yet and renders the still — the panel is the same either way. */
 const DOORS = [
   {
     id: 'lock',
@@ -1840,6 +1845,7 @@ const DOORS = [
     line: 'Turnstile or boom gate.',
     for: 'Gyms, theme parks, larger clubs.',
     specs: ['One-in-one-out flow', 'Anti-tailgating (optional)', 'High-traffic ready'],
+    video: 'door-gate.mp4',
     image: 'door-gate.jpg',
     alt: 'A member walking through a Face-ID auto-gate turnstile lane at a gym entrance',
   },
@@ -1848,6 +1854,7 @@ const DOORS = [
 function DoorSection() {
   const [pick, setPick] = useState(1)
   const door = DOORS[pick]
+  const base = import.meta.env.BASE_URL
 
   return (
     <SectionShell id="door" label="At the door" className="bg-ink-900">
@@ -1905,20 +1912,38 @@ function DoorSection() {
         </div>
 
         <div className="lg:col-span-6 lg:col-start-7">
-          {/* The photograph carries it now; the diagram survives as a schematic
-              inset. Both earn their place for a hardware decision — the photo
-              says what it looks like on a wall, the diagram says how the lane is
-              laid out, which no photograph of a single doorway shows. */}
+          {/* The footage carries it now; the diagram survives as a schematic
+              inset. Both earn their place for a hardware decision — the film
+              says what it looks like and how fast it clears, the diagram says
+              how the lane is laid out, which no shot of a single doorway shows.
+              The diagram stays on the film tab for that reason, unlike the
+              drawn device in SectorMedia: it is a plan, not a stand-in for the
+              hardware already on screen. */}
           <div className="relative">
             <div className="aspect-[3/2] overflow-hidden rounded-3xl border border-white/10 bg-ink-950">
               <Swap id={door.id} y={0} duration={0.5} className="h-full">
-                <img
-                  src={`${import.meta.env.BASE_URL}${IMG}${door.image}`}
-                  alt={door.alt}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-full w-full object-cover"
-                />
+                {door.video ? (
+                  /* `ratio="fill"` because the 3:2 is already set by the box
+                     above — letting the video set its own would nest two
+                     aspect boxes. The still rides along as the poster, so
+                     switching tabs never shows an empty frame while this
+                     buffers. */
+                  <CinematicVideo
+                    ratio="fill"
+                    src={`${base}video/qstudio/door/${door.video}`}
+                    poster={`${base}video/qstudio/door/${door.video.replace('.mp4', '-poster.jpg')}`}
+                    label={door.alt}
+                    className="h-full w-full"
+                  />
+                ) : (
+                  <img
+                    src={`${base}${IMG}${door.image}`}
+                    alt={door.alt}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                  />
+                )}
               </Swap>
               <span
                 aria-hidden
